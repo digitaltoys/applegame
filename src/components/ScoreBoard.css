@@ -1,0 +1,12 @@
+/* src/components/ScoreBoard.css */
+.score-board {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: #f9f9f9;
+}
+.score-board h2 {
+  margin: 0;
+  font-size: 1.2em;
+  color: #333;
+}

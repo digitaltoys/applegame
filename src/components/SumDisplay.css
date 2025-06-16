@@ -1,0 +1,14 @@
+/* src/components/SumDisplay.css */
+.sum-display {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: #f9f9f9;
+  margin-top: 10px; /* Add some space if it's stacked */
+}
+.sum-display p {
+  margin: 0;
+  font-size: 1.1em;
+  font-weight: bold;
+  color: #27ae60; /* Green color for sum */
+}
