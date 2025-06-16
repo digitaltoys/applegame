@@ -4,20 +4,43 @@ import ScoreBoard from './components/ScoreBoard';
 import TimerBar from './components/TimerBar';
 import Controls from './components/Controls';
 import SumDisplay from './components/SumDisplay';
-import React, { useState } from 'react'; // Import useState
+import React, { useState, useEffect } from 'react'; // Import useState and useEffect
+
+// Define INITIAL_TIME_LEFT constant
+const INITIAL_TIME_LEFT = 60;
 
 function App() {
   // Basic state placeholders
   const [score, setScore] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(60);
+  // Set timeLeft initial state to INITIAL_TIME_LEFT
+  const [timeLeft, setTimeLeft] = useState(INITIAL_TIME_LEFT);
   const [isPaused, setIsPaused] = useState(false);
   const [currentSum, setCurrentSum] = useState(0);
+
+  // useEffect for timer logic
+  useEffect(() => {
+    // Timer interval
+    const interval = setInterval(() => {
+      if (!isPaused && timeLeft > 0) {
+        setTimeLeft(prevTimeLeft => prevTimeLeft - 1);
+      }
+    }, 1000);
+
+    // Game over condition
+    if (timeLeft === 0) {
+      console.log("Game Over!");
+      setIsPaused(true);
+    }
+
+    // Clear interval on component unmount or when isPaused/timeLeft changes
+    return () => clearInterval(interval);
+  }, [isPaused, timeLeft]);
 
   const handleRestart = () => {
     // Placeholder for restart logic
     console.log("Restarting game...");
     setScore(0);
-    setTimeLeft(60);
+    setTimeLeft(INITIAL_TIME_LEFT); // Reset timeLeft to INITIAL_TIME_LEFT
     setIsPaused(false);
     setCurrentSum(0);
   };
