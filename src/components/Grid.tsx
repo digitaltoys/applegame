@@ -122,16 +122,22 @@ const Grid: React.FC<GridProps> = () => {
     setIsDragging(false);
 
     const sum = selectedApples.reduce((acc, apple) => acc + apple.value, 0);
-    setCurrentSum(sum);
+    setCurrentSum(sum); // 합계는 표시를 위해 먼저 업데이트
 
-    // console.log("Selected Apples:", selectedApples);
-    // console.log("Current Sum:", sum);
+    if (sum === 10) {
+      const newGridData = [...gridData];
+      selectedApples.forEach(apple => {
+        newGridData[apple.row][apple.col] = 0; // 사과 제거 (0으로 표시)
+      });
+      setGridData(newGridData);
+      // TODO: 점수 업데이트 로직 추가 필요 (2-4 태스크)
+    }
 
-    // Reset dragStartCell and dragCurrentCell if you want selection to clear,
-    // or keep them to allow sum-checking logic to proceed with current selection.
-    // For this task, we'll keep them until next mousedown.
-    // setDragStartCell(null);
-    // setDragCurrentCell(null);
+    // 합이 10이든 아니든 선택 해제 및 합계 초기화
+    setSelectedApples([]);
+    setCurrentSum(0); // 실제 합계가 10이 아니었거나, 10이어서 처리된 후에는 UI 합계 표시를 0으로 리셋
+    setDragStartCell(null); // 다음 드래그를 위해 시작 셀 초기화
+    setDragCurrentCell(null); // 다음 드래그를 위해 현재 셀 초기화
   };
 
   // Render logic
