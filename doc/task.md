@@ -1,9 +1,9 @@
 # 할일 목록 (Task List)
 
 ## 0. 개발 환경 설정 및 기술 스택 확인
-- [ ] Vite, React, TypeScript, Tailwind CSS 기반 프론트엔드 개발 환경 설정
-- [ ] Zustand 라이브러리 도입 검토 및 필요시 설정 (복잡한 상태 관리용)
-- [ ] json-server를 이용한 백엔드 모킹 환경 구축
+- [x] Vite, React, TypeScript, Tailwind CSS 기반 프론트엔드 개발 환경 설정
+- [x] Zustand 라이브러리 도입 검토 및 필요시 설정 (복잡한 상태 관리용)
+- [x] json-server를 이용한 백엔드 모킹 환경 구축
 
 ## 1. 게임 개요
 - [ ] 게임 개요 이해 및 문서화
