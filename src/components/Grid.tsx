@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'; // Added useRef
 import './Grid.css';
 
 interface GridProps {
-  // Props will be defined later
+  setScore: React.Dispatch<React.SetStateAction<number>>;
 }
 
 // 셀의 좌표를 나타내는 인터페이스
@@ -55,7 +55,7 @@ const getCellCoordsFromEvent = (event: React.MouseEvent<HTMLDivElement>, gridRef
 };
 
 
-const Grid: React.FC<GridProps> = () => {
+const Grid: React.FC<GridProps> = ({ setScore }) => {
   const [gridData, setGridData] = useState<(number | string)[][]>([]);
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [dragStartCell, setDragStartCell] = useState<CellPosition | null>(null);
@@ -135,22 +135,29 @@ const Grid: React.FC<GridProps> = () => {
     setIsDragging(false);
 
     const sum = selectedApples.reduce((acc, apple) => acc + apple.value, 0);
-    setCurrentSum(sum); // 합계는 표시를 위해 먼저 업데이트
+    // setCurrentSum(sum); // setCurrentSum is called within the if/else blocks now.
 
     if (sum === 10) {
-      const newGridData = [...gridData]; // 타입이 (number | string)[][]
+      // Score update logic: add the number of removed apples to the current score.
+      // This must be done before selectedApples is cleared.
+      setScore(prevScore => prevScore + selectedApples.length);
+
+      const newGridData = [...gridData];
       selectedApples.forEach(apple => {
-        newGridData[apple.row][apple.col] = ''; // 사과 제거 (빈 문자열로 표시)
+        newGridData[apple.row][apple.col] = ''; // Remove apples
       });
       setGridData(newGridData);
-      // TODO: 점수 업데이트 로직 추가 필요 (2-4 태스크)
+      // After apples are removed, clear selected apples and reset sum display
+      setSelectedApples([]);
+      setCurrentSum(0); // Reset sum display
+    } else {
+      // If sum is not 10, just clear selection and reset sum display
+      setSelectedApples([]);
+      setCurrentSum(0); // Reset sum display
     }
 
-    // 합이 10이든 아니든 선택 해제 및 합계 초기화
-    setSelectedApples([]);
-    setCurrentSum(0); // 실제 합계가 10이 아니었거나, 10이어서 처리된 후에는 UI 합계 표시를 0으로 리셋
-    setDragStartCell(null); // 다음 드래그를 위해 시작 셀 초기화
-    setDragCurrentCell(null); // 다음 드래그를 위해 현재 셀 초기화
+    setDragStartCell(null);
+    setDragCurrentCell(null);
   };
 
   // Render logic
