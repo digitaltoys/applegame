@@ -56,8 +56,10 @@
 - 사운드: 클릭, 성공(합 10) 효과음, 실패/타임오버 음향.
 
 ## 7. 기술 스택 제안
-- 프론트엔드: HTML5 Canvas 또는 WebGL(PixiJS) / React + CSS.
-- 백엔드(선택): 서버 없이 로컬·웹 스토리지에 최고 점수 저장. 랭킹이 필요하면 Firebase 등 사용.
+- 프론트엔드: Vite, React, TypeScript, Tailwind CSS를 핵심 기술 스택으로 사용합니다.
+    - UI 개발의 편의성을 위해 CSS-in-JS 라이브러리 (예: Styled Components, Emotion) 사용을 고려할 수 있습니다.
+    - 복잡한 상태 관리가 필요할 경우, 경량 상태 관리 라이브러리 (예: Zustand, Recoil) 도입을 고려할 수 있습니다.
+- 백엔드(선택): 서버 없이 로컬·웹 스토리지에 최고 점수 저장. 랭킹 기능이 필요하다면 Firebase, Supabase 등의 BaaS (Backend as a Service) 사용을 고려할 수 있습니다.
 
 ## 8. 확장 아이디어(후순위)
 - 레벨 시스템(격자 크기, 타이머 변화).
