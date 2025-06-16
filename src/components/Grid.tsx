@@ -78,10 +78,18 @@ const Grid: React.FC<GridProps> = () => {
 
     const coords = getCellCoordsFromEvent(event, gridRef.current);
     if (coords) {
+      const cellValue = gridData[coords.row][coords.col];
+      // 빈 문자열인 셀에서는 드래그를 시작할 수 없도록 처리 (선택 사항이지만, UX 개선 가능)
+      if (cellValue === '') {
+        setIsDragging(false); // 드래그 시작 안 함
+        return;
+      }
+      const numericValue = Number(cellValue); // `''`는 0으로, 숫자는 숫자로 변환
+
       setIsDragging(true);
       setDragStartCell(coords);
-      setSelectedApples([{ row: coords.row, col: coords.col, value: gridData[coords.row][coords.col] }]); // Select starting cell
-      setCurrentSum(gridData[coords.row][coords.col]); // Set sum for the starting cell
+      setSelectedApples([{ row: coords.row, col: coords.col, value: numericValue }]); // Select starting cell
+      setCurrentSum(numericValue); // Set sum for the starting cell
       setDragCurrentCell(coords);
     }
   };
@@ -105,8 +113,13 @@ const Grid: React.FC<GridProps> = () => {
 
       for (let r = minRow; r <= maxRow; r++) {
         for (let c = minCol; c <= maxCol; c++) {
+          // Ensure gridData[r] exists and gridData[r][c] is not undefined
           if (gridData[r] && gridData[r][c] !== undefined) {
-            newSelectedApples.push({ row: r, col: c, value: gridData[r][c] });
+            const cellValue = gridData[r][c];
+            // Only include actual apples (not empty strings)
+            if (cellValue !== '') {
+              newSelectedApples.push({ row: r, col: c, value: Number(cellValue) });
+            }
           }
         }
       }
