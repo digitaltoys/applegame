@@ -20,10 +20,10 @@ const GRID_SIZE = 10;
 
 const generateRandomNumber = () => Math.floor(Math.random() * 9) + 1;
 
-const initializeGrid = (): number[][] => {
-  const newGrid = [];
+const initializeGrid = (): (number | string)[][] => {
+  const newGrid: (number | string)[][] = [];
   for (let i = 0; i < GRID_SIZE; i++) {
-    const row = [];
+    const row: (number | string)[] = [];
     for (let j = 0; j < GRID_SIZE; j++) {
       row.push(generateRandomNumber());
     }
@@ -56,7 +56,7 @@ const getCellCoordsFromEvent = (event: React.MouseEvent<HTMLDivElement>, gridRef
 
 
 const Grid: React.FC<GridProps> = () => {
-  const [gridData, setGridData] = useState<number[][]>([]);
+  const [gridData, setGridData] = useState<(number | string)[][]>([]);
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [dragStartCell, setDragStartCell] = useState<CellPosition | null>(null);
   const [dragCurrentCell, setDragCurrentCell] = useState<CellPosition | null>(null); // dragCurrentCell is kept for potential future use, though not directly used in selection logic in this version
@@ -125,9 +125,9 @@ const Grid: React.FC<GridProps> = () => {
     setCurrentSum(sum); // 합계는 표시를 위해 먼저 업데이트
 
     if (sum === 10) {
-      const newGridData = [...gridData];
+      const newGridData = [...gridData]; // 타입이 (number | string)[][]
       selectedApples.forEach(apple => {
-        newGridData[apple.row][apple.col] = 0; // 사과 제거 (0으로 표시)
+        newGridData[apple.row][apple.col] = ''; // 사과 제거 (빈 문자열로 표시)
       });
       setGridData(newGridData);
       // TODO: 점수 업데이트 로직 추가 필요 (2-4 태스크)
@@ -153,7 +153,7 @@ const Grid: React.FC<GridProps> = () => {
             data-row={i}
             data-col={j}
           >
-            {gridData[i][j]}
+            {gridData[i][j] !== 0 && gridData[i][j] !== '' ? gridData[i][j] : ''}
           </div>
         );
       }
