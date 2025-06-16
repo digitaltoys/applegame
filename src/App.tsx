@@ -62,7 +62,7 @@ function App() {
           <TimerBar timeLeft={timeLeft} />
           <SumDisplay sum={currentSum} />
         </div>
-        <Grid />
+        <Grid setScore={setScore} />
       </main>
       <footer className="app-controls">
         <Controls
