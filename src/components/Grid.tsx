@@ -20,10 +20,10 @@ const GRID_SIZE = 10;
 
 const generateRandomNumber = () => Math.floor(Math.random() * 9) + 1;
 
-const initializeGrid = (): number[][] => {
-  const newGrid = [];
+const initializeGrid = (): (number | string)[][] => {
+  const newGrid: (number | string)[][] = [];
   for (let i = 0; i < GRID_SIZE; i++) {
-    const row = [];
+    const row: (number | string)[] = [];
     for (let j = 0; j < GRID_SIZE; j++) {
       row.push(generateRandomNumber());
     }
@@ -56,7 +56,7 @@ const getCellCoordsFromEvent = (event: React.MouseEvent<HTMLDivElement>, gridRef
 
 
 const Grid: React.FC<GridProps> = () => {
-  const [gridData, setGridData] = useState<number[][]>([]);
+  const [gridData, setGridData] = useState<(number | string)[][]>([]);
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [dragStartCell, setDragStartCell] = useState<CellPosition | null>(null);
   const [dragCurrentCell, setDragCurrentCell] = useState<CellPosition | null>(null); // dragCurrentCell is kept for potential future use, though not directly used in selection logic in this version
@@ -78,10 +78,18 @@ const Grid: React.FC<GridProps> = () => {
 
     const coords = getCellCoordsFromEvent(event, gridRef.current);
     if (coords) {
+      const cellValue = gridData[coords.row][coords.col];
+      // 빈 문자열인 셀에서는 드래그를 시작할 수 없도록 처리 (선택 사항이지만, UX 개선 가능)
+      if (cellValue === '') {
+        setIsDragging(false); // 드래그 시작 안 함
+        return;
+      }
+      const numericValue = Number(cellValue); // `''`는 0으로, 숫자는 숫자로 변환
+
       setIsDragging(true);
       setDragStartCell(coords);
-      setSelectedApples([{ row: coords.row, col: coords.col, value: gridData[coords.row][coords.col] }]); // Select starting cell
-      setCurrentSum(gridData[coords.row][coords.col]); // Set sum for the starting cell
+      setSelectedApples([{ row: coords.row, col: coords.col, value: numericValue }]); // Select starting cell
+      setCurrentSum(numericValue); // Set sum for the starting cell
       setDragCurrentCell(coords);
     }
   };
@@ -105,8 +113,13 @@ const Grid: React.FC<GridProps> = () => {
 
       for (let r = minRow; r <= maxRow; r++) {
         for (let c = minCol; c <= maxCol; c++) {
+          // Ensure gridData[r] exists and gridData[r][c] is not undefined
           if (gridData[r] && gridData[r][c] !== undefined) {
-            newSelectedApples.push({ row: r, col: c, value: gridData[r][c] });
+            const cellValue = gridData[r][c];
+            // Only include actual apples (not empty strings)
+            if (cellValue !== '') {
+              newSelectedApples.push({ row: r, col: c, value: Number(cellValue) });
+            }
           }
         }
       }
@@ -122,16 +135,22 @@ const Grid: React.FC<GridProps> = () => {
     setIsDragging(false);
 
     const sum = selectedApples.reduce((acc, apple) => acc + apple.value, 0);
-    setCurrentSum(sum);
+    setCurrentSum(sum); // 합계는 표시를 위해 먼저 업데이트
 
-    // console.log("Selected Apples:", selectedApples);
-    // console.log("Current Sum:", sum);
+    if (sum === 10) {
+      const newGridData = [...gridData]; // 타입이 (number | string)[][]
+      selectedApples.forEach(apple => {
+        newGridData[apple.row][apple.col] = ''; // 사과 제거 (빈 문자열로 표시)
+      });
+      setGridData(newGridData);
+      // TODO: 점수 업데이트 로직 추가 필요 (2-4 태스크)
+    }
 
-    // Reset dragStartCell and dragCurrentCell if you want selection to clear,
-    // or keep them to allow sum-checking logic to proceed with current selection.
-    // For this task, we'll keep them until next mousedown.
-    // setDragStartCell(null);
-    // setDragCurrentCell(null);
+    // 합이 10이든 아니든 선택 해제 및 합계 초기화
+    setSelectedApples([]);
+    setCurrentSum(0); // 실제 합계가 10이 아니었거나, 10이어서 처리된 후에는 UI 합계 표시를 0으로 리셋
+    setDragStartCell(null); // 다음 드래그를 위해 시작 셀 초기화
+    setDragCurrentCell(null); // 다음 드래그를 위해 현재 셀 초기화
   };
 
   // Render logic
@@ -147,7 +166,7 @@ const Grid: React.FC<GridProps> = () => {
             data-row={i}
             data-col={j}
           >
-            {gridData[i][j]}
+            {gridData[i][j] !== 0 && gridData[i][j] !== '' ? gridData[i][j] : ''}
           </div>
         );
       }
