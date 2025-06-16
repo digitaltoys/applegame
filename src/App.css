@@ -1,42 +1,57 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+/* src/App.css */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: sans-serif;
+  min-height: 100vh;
+  background-color: #f0f0f0; /* Light gray background */
+}
+
+.app-header {
+  background-color: #333; /* Dark header */
+  color: white;
+  padding: 10px 20px;
   text-align: center;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-}
-
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.game-area {
+  display: flex;
+  flex-direction: row; /* Side-by-side layout for info and grid */
+  justify-content: center; /* Center game elements */
+  align-items: flex-start; /* Align items to the top */
+  padding: 20px;
+  gap: 20px; /* Space between info and grid */
+  width: 100%;
+  max-width: 1000px; /* Max width for the game area */
+  box-sizing: border-box;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.game-info {
+  display: flex;
+  flex-direction: column;
+  gap: 15px; /* Space between info components */
+  min-width: 150px; /* Minimum width for the info panel */
+  padding: 15px;
+  background-color: #fff; /* White background for info panel */
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-.card {
-  padding: 2em;
+/* Grid will take up remaining space, ensure it's styled in Grid.css */
+
+.app-controls {
+  padding: 15px;
+  background-color: #fff; /* White background for controls */
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  margin-top: 20px; /* Space above controls */
 }
 
-.read-the-docs {
-  color: #888;
+/* Basic h1 styling if not already present */
+h1 {
+  margin: 0;
+  font-size: 1.5em;
 }
