@@ -48,6 +48,8 @@
        or rely on main app container scrolling if that's preferred.
        For a modal-like screen, 100vh might still be intended. */
     padding: 20px; /* Add some padding for smaller screens */
+    width: 100%; /* Make the container span the full viewport width */
+    box-sizing: border-box; /* Ensure padding/border don't add to width */
   }
 
   .game-over-screen h1 {
