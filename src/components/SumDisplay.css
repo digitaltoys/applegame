@@ -12,3 +12,17 @@
   font-weight: bold;
   color: #27ae60; /* Green color for sum */
 }
+
+@media (max-width: 768px) {
+  .sum-display {
+    padding: 8px; /* Slightly reduce padding */
+    margin-top: 8px; /* Adjust margin if needed */
+    /* Ensure no horizontal margins that conflict with game-info's width: 90% */
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .sum-display p {
+    font-size: 1em; /* Slightly reduce font size */
+  }
+}

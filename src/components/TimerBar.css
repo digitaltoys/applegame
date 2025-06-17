@@ -10,3 +10,16 @@
   font-size: 1em;
   color: #c0392b; /* Reddish color for time */
 }
+
+@media (max-width: 768px) {
+  .timer-bar {
+    padding: 8px; /* Slightly reduce padding */
+    /* Ensure no horizontal margins that conflict with game-info's width: 90% */
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .timer-bar p {
+    font-size: 0.9em; /* Slightly reduce font size */
+  }
+}

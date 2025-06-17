@@ -10,3 +10,16 @@
   font-size: 1.2em;
   color: #333;
 }
+
+@media (max-width: 768px) {
+  .score-board {
+    padding: 8px; /* Slightly reduce padding */
+    /* Ensure no horizontal margins that conflict with game-info's width: 90% */
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .score-board h2 {
+    font-size: 1.1em; /* Slightly reduce font size */
+  }
+}

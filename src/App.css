@@ -56,3 +56,25 @@ h1 {
   margin: 0;
   font-size: 1.5em;
 }
+
+@media (max-width: 768px) {
+  .game-area {
+    flex-direction: column;
+    align-items: center; /* Center items in column layout */
+  }
+
+  .game-info {
+    width: 90%; /* Adjust width for mobile */
+    min-width: auto; /* Override min-width for smaller screens */
+    align-items: stretch; /* Stretch info content like score, etc. */
+  }
+
+  /* Assuming grid will naturally take full width or is handled in Grid.css for responsiveness */
+  /* If .grid-container or similar needs specific width adjustments in App.css for mobile: */
+  /*
+  .grid-container { // Example, if such a class were styled here for layout
+    width: 90%;
+    margin-top: 10px; // Adjust spacing if needed
+  }
+  */
+}
