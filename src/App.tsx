@@ -28,7 +28,7 @@ function App() {
 
     // Game over condition
     if (timeLeft === 0) {
-      console.log("Game Over!");
+      // console.log("Game Over!"); // Removed
       setIsPaused(true);
     }
 
@@ -36,9 +36,24 @@ function App() {
     return () => clearInterval(interval);
   }, [isPaused, timeLeft]);
 
+  // useEffect for keyboard controls (pause/resume)
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape" || event.key.toLowerCase() === "p") {
+        handlePauseToggle();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []); // Empty dependency array means this effect runs once on mount and cleanup on unmount
+
   const handleRestart = () => {
     // Placeholder for restart logic
-    console.log("Restarting game...");
+    // console.log("Restarting game..."); // Removed
     setScore(0);
     setTimeLeft(INITIAL_TIME_LEFT); // Reset timeLeft to INITIAL_TIME_LEFT
     setIsPaused(false);
@@ -47,7 +62,7 @@ function App() {
 
   const handlePauseToggle = () => {
     // Placeholder for pause/resume logic
-    console.log("Toggling pause...");
+    // console.log("Toggling pause..."); // Removed
     setIsPaused(!isPaused);
   };
 
@@ -62,7 +77,7 @@ function App() {
           <TimerBar timeLeft={timeLeft} />
           <SumDisplay sum={currentSum} />
         </div>
-        <Grid setScore={setScore} />
+        <Grid setScore={setScore} isPaused={isPaused} onSumChange={setCurrentSum} />
       </main>
       <footer className="app-controls">
         <Controls
