@@ -45,11 +45,11 @@
 /* Grid will take up remaining space, ensure it's styled in Grid.css */
 
 .app-controls {
-  padding: 15px;
+  padding: 5px;
   background-color: #fff; /* White background for controls */
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  margin-top: 20px; /* Space above controls */
+  margin-top: 5px; /* Space above controls */
 }
 
 /* Basic h1 styling if not already present */

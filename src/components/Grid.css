@@ -34,8 +34,8 @@
 
 @media (max-width: 768px) {
   .grid-container {
-    grid-template-columns: repeat(10, 30px); /* Reduced cell size for 10 columns */
-    grid-template-rows: repeat(10, 30px);    /* Reduced cell size for 10 rows */
+    grid-template-columns: repeat(10, 36px); /* Reduced cell size for 10 columns */
+    grid-template-rows: repeat(10, 36px);    /* Reduced cell size for 10 rows */
     margin: 10px auto; /* Adjust margin for smaller screens */
     /* Consider overflow-x: auto; if it might still be too wide for very small screens,
        though ideally, it should fit. */
