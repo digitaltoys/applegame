@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react'; // Added useRef
+import React, { useState, useEffect, useRef } from 'react'; // Added useRef
 import './Grid.css';
 
 interface GridProps {
   setScore: React.Dispatch<React.SetStateAction<number>>;
-  isPaused?: boolean;
-  onSumChange: (sum: number) => void;
+  setCurrentSum: React.Dispatch<React.SetStateAction<number>>;
+  onGameWin: () => void;
 }
 
 // 셀의 좌표를 나타내는 인터페이스
@@ -70,13 +71,13 @@ const getCellCoordsFromEvent = (event: React.MouseEvent<HTMLDivElement> | React.
 };
 
 
-const Grid: React.FC<GridProps> = ({ setScore, isPaused, onSumChange }) => {
+const Grid: React.FC<GridProps> = ({ setScore, setCurrentSum, onGameWin }) => {
   const [gridData, setGridData] = useState<(number | string)[][]>([]);
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [dragStartCell, setDragStartCell] = useState<CellPosition | null>(null);
   const [dragCurrentCell, setDragCurrentCell] = useState<CellPosition | null>(null); // dragCurrentCell is kept for potential future use, though not directly used in selection logic in this version
   const [selectedApples, setSelectedApples] = useState<SelectedApple[]>([]);
-  // const [currentSum, setCurrentSum] = useState<number>(0); // Removed local sum state
+  // const [currentSum, setCurrentSum] = useState<number>(0); // App.tsx에서 관리하도록 변경
   const gridRef = useRef<HTMLDivElement>(null); // Ref for the grid container
 
   useEffect(() => {
@@ -140,8 +141,9 @@ const Grid: React.FC<GridProps> = ({ setScore, isPaused, onSumChange }) => {
         }
       }
       setSelectedApples(newSelectedApples);
+      // Optional: Calculate sum in real-time during drag
       const sum = newSelectedApples.reduce((acc, apple) => acc + apple.value, 0);
-      onSumChange(sum); // Update sum in App.tsx in real-time
+      setCurrentSum(sum); // 실시간 합계 업데이트
     }
   };
 
@@ -150,25 +152,31 @@ const Grid: React.FC<GridProps> = ({ setScore, isPaused, onSumChange }) => {
     setIsDragging(false);
 
     const sum = selectedApples.reduce((acc, apple) => acc + apple.value, 0);
-    // setCurrentSum(sum); // setCurrentSum is called within the if/else blocks now.
+    // setCurrentSum(sum); // App.tsx의 setCurrentSum으로 업데이트는 handleMouseMove에서 이미 처리됨
 
     if (sum === 10) {
-      // Score update logic: add the number of removed apples to the current score.
-      // This must be done before selectedApples is cleared.
       setScore(prevScore => prevScore + selectedApples.length);
 
-      const newGridData = [...gridData];
+      const newGridData = gridData.map(row => [...row]); // Deep copy
       selectedApples.forEach(apple => {
         newGridData[apple.row][apple.col] = ''; // Remove apples
       });
       setGridData(newGridData);
-      // After apples are removed, clear selected apples and reset sum display
+      setCurrentSum(0); // Reset sum display in App.tsx
       setSelectedApples([]);
-      onSumChange(0); // Reset sum display in App.tsx
+      //onSumChange(0); // Reset sum display in App.tsx
+
+      // Check for game win condition (all apples cleared)
+      const remainingApples = newGridData.flat().some(cell => cell !== '' && cell !== 0);
+      if (!remainingApples) {
+        onGameWin(); // Notify App.tsx that the game is won
+      }
+
     } else {
       // If sum is not 10, just clear selection and reset sum display
       setSelectedApples([]);
-      onSumChange(0); // Reset sum display in App.tsx
+      setCurrentSum(0); // Reset sum display in App.tsx
+      //onSumChange(0); // Reset sum display in App.tsx
     }
 
     setDragStartCell(null);
@@ -253,8 +261,10 @@ const Grid: React.FC<GridProps> = ({ setScore, isPaused, onSumChange }) => {
       onSumChange(0); // Reset sum display in App.tsx
     }
 
+    setSelectedApples([]); // Clear selection regardless of sum
     setDragStartCell(null);
     setDragCurrentCell(null);
+    // isDragging은 이미 false로 설정됨
   };
 
   // Render logic
@@ -297,7 +307,7 @@ const Grid: React.FC<GridProps> = ({ setScore, isPaused, onSumChange }) => {
       >
         {cells}
       </div>
-      {/* Removed local sum display */}
+      {/* SumDisplay는 App.tsx에서 렌더링되므로 여기서 제거 */}
     </div>
   );
 };
