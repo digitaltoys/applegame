@@ -3,6 +3,8 @@ import './Grid.css';
 
 interface GridProps {
   setScore: React.Dispatch<React.SetStateAction<number>>;
+  isPaused?: boolean;
+  onSumChange: (sum: number) => void;
 }
 
 // 셀의 좌표를 나타내는 인터페이스
@@ -32,13 +34,26 @@ const initializeGrid = (): (number | string)[][] => {
   return newGrid;
 };
 
-// Helper function to get cell coordinates from mouse event relative to the grid
-const getCellCoordsFromEvent = (event: React.MouseEvent<HTMLDivElement>, gridRef: HTMLDivElement | null): CellPosition | null => {
+// Helper function to get cell coordinates from mouse or touch event relative to the grid
+const getCellCoordsFromEvent = (event: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>, gridRef: HTMLDivElement | null): CellPosition | null => {
   if (!gridRef) return null;
 
   const rect = gridRef.getBoundingClientRect();
-  const x = event.clientX - rect.left;
-  const y = event.clientY - rect.top;
+  let clientX, clientY;
+
+  if ('touches' in event) {
+    // Touch event
+    if (event.touches.length === 0) return null; // No touches, should not happen in start/move
+    clientX = event.touches[0].clientX;
+    clientY = event.touches[0].clientY;
+  } else {
+    // Mouse event
+    clientX = event.clientX;
+    clientY = event.clientY;
+  }
+
+  const x = clientX - rect.left;
+  const y = clientY - rect.top;
 
   // Assuming square cells and no margins/padding within the grid container affecting cell positioning
   // These cell dimensions should ideally come from dynamic calculation or props if they can vary
@@ -55,13 +70,13 @@ const getCellCoordsFromEvent = (event: React.MouseEvent<HTMLDivElement>, gridRef
 };
 
 
-const Grid: React.FC<GridProps> = ({ setScore }) => {
+const Grid: React.FC<GridProps> = ({ setScore, isPaused, onSumChange }) => {
   const [gridData, setGridData] = useState<(number | string)[][]>([]);
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [dragStartCell, setDragStartCell] = useState<CellPosition | null>(null);
   const [dragCurrentCell, setDragCurrentCell] = useState<CellPosition | null>(null); // dragCurrentCell is kept for potential future use, though not directly used in selection logic in this version
   const [selectedApples, setSelectedApples] = useState<SelectedApple[]>([]);
-  const [currentSum, setCurrentSum] = useState<number>(0);
+  // const [currentSum, setCurrentSum] = useState<number>(0); // Removed local sum state
   const gridRef = useRef<HTMLDivElement>(null); // Ref for the grid container
 
   useEffect(() => {
@@ -69,6 +84,7 @@ const Grid: React.FC<GridProps> = ({ setScore }) => {
   }, []);
 
   const handleMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (isPaused) return; // Disable interaction if paused
     // Check if the click is on a grid cell directly, not on the scrollbars or edges of grid-container
     const target = event.target as HTMLElement;
     if (!target.classList.contains('grid-cell') && !target.classList.contains('grid-container')) {
@@ -89,7 +105,7 @@ const Grid: React.FC<GridProps> = ({ setScore }) => {
       setIsDragging(true);
       setDragStartCell(coords);
       setSelectedApples([{ row: coords.row, col: coords.col, value: numericValue }]); // Select starting cell
-      setCurrentSum(numericValue); // Set sum for the starting cell
+      onSumChange(numericValue); // Update sum in App.tsx
       setDragCurrentCell(coords);
     }
   };
@@ -124,9 +140,8 @@ const Grid: React.FC<GridProps> = ({ setScore }) => {
         }
       }
       setSelectedApples(newSelectedApples);
-      // Optional: Calculate sum in real-time during drag
-      // const sum = newSelectedApples.reduce((acc, apple) => acc + apple.value, 0);
-      // setCurrentSum(sum);
+      const sum = newSelectedApples.reduce((acc, apple) => acc + apple.value, 0);
+      onSumChange(sum); // Update sum in App.tsx in real-time
     }
   };
 
@@ -149,11 +164,93 @@ const Grid: React.FC<GridProps> = ({ setScore }) => {
       setGridData(newGridData);
       // After apples are removed, clear selected apples and reset sum display
       setSelectedApples([]);
-      setCurrentSum(0); // Reset sum display
+      onSumChange(0); // Reset sum display in App.tsx
     } else {
       // If sum is not 10, just clear selection and reset sum display
       setSelectedApples([]);
-      setCurrentSum(0); // Reset sum display
+      onSumChange(0); // Reset sum display in App.tsx
+    }
+
+    setDragStartCell(null);
+    setDragCurrentCell(null);
+  };
+
+  const handleTouchStart = (event: React.TouchEvent<HTMLDivElement>) => {
+    if (isPaused) return; // Disable interaction if paused
+    event.preventDefault(); // Prevent scrolling
+    const target = event.target as HTMLElement;
+    if (!target.classList.contains('grid-cell') && !target.classList.contains('grid-container')) {
+        return;
+    }
+
+    const coords = getCellCoordsFromEvent(event, gridRef.current);
+    if (coords) {
+      const cellValue = gridData[coords.row][coords.col];
+      if (cellValue === '') {
+        setIsDragging(false);
+        return;
+      }
+      const numericValue = Number(cellValue);
+
+      setIsDragging(true);
+      setDragStartCell(coords);
+      setSelectedApples([{ row: coords.row, col: coords.col, value: numericValue }]);
+      onSumChange(numericValue); // Update sum in App.tsx
+      setDragCurrentCell(coords);
+    }
+  };
+
+  const handleTouchMove = (event: React.TouchEvent<HTMLDivElement>) => {
+    event.preventDefault(); // Prevent scrolling during drag
+    if (!isDragging || !dragStartCell) return;
+
+    const currentCoords = getCellCoordsFromEvent(event, gridRef.current);
+    if (currentCoords) {
+      if (dragCurrentCell && currentCoords.row === dragCurrentCell.row && currentCoords.col === dragCurrentCell.col) {
+        return;
+      }
+      setDragCurrentCell(currentCoords);
+
+      const newSelectedApples: SelectedApple[] = [];
+      const minRow = Math.min(dragStartCell.row, currentCoords.row);
+      const maxRow = Math.max(dragStartCell.row, currentCoords.row);
+      const minCol = Math.min(dragStartCell.col, currentCoords.col);
+      const maxCol = Math.max(dragStartCell.col, currentCoords.col);
+
+      for (let r = minRow; r <= maxRow; r++) {
+        for (let c = minCol; c <= maxCol; c++) {
+          if (gridData[r] && gridData[r][c] !== undefined) {
+            const cellValue = gridData[r][c];
+            if (cellValue !== '') {
+              newSelectedApples.push({ row: r, col: c, value: Number(cellValue) });
+            }
+          }
+        }
+      }
+      setSelectedApples(newSelectedApples);
+      const sum = newSelectedApples.reduce((acc, apple) => acc + apple.value, 0);
+      onSumChange(sum); // Update sum in App.tsx in real-time
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (!isDragging) return;
+    setIsDragging(false);
+
+    const sum = selectedApples.reduce((acc, apple) => acc + apple.value, 0);
+
+    if (sum === 10) {
+      setScore(prevScore => prevScore + selectedApples.length);
+      const newGridData = [...gridData];
+      selectedApples.forEach(apple => {
+        newGridData[apple.row][apple.col] = '';
+      });
+      setGridData(newGridData);
+      setSelectedApples([]);
+      onSumChange(0); // Reset sum display in App.tsx
+    } else {
+      setSelectedApples([]);
+      onSumChange(0); // Reset sum display in App.tsx
     }
 
     setDragStartCell(null);
@@ -194,12 +291,13 @@ const Grid: React.FC<GridProps> = ({ setScore }) => {
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp} // End drag if mouse leaves grid
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
       >
         {cells}
       </div>
-      <div className="sum-display">
-        <p>Current Sum: {currentSum}</p>
-      </div>
+      {/* Removed local sum display */}
     </div>
   );
 };
