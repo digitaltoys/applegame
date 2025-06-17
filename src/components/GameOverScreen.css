@@ -1,0 +1,43 @@
+.game-over-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  text-align: center;
+  background-color: rgba(0, 0, 0, 0.8); /* 약간 어두운 배경 */
+  color: white;
+}
+
+.game-over-screen h1 {
+  font-size: 3rem;
+  margin-bottom: 20px;
+}
+
+.score-summary p {
+  font-size: 1.5rem;
+  margin: 10px 0;
+}
+
+.buttons {
+  margin-top: 30px;
+}
+
+.buttons button {
+  padding: 10px 20px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  margin: 0 10px;
+  border: none;
+  border-radius: 5px;
+}
+
+.restart-button {
+  background-color: #4CAF50; /* 초록색 */
+  color: white;
+}
+
+.main-menu-button {
+  background-color: #f44336; /* 빨간색 */
+  color: white;
+}
