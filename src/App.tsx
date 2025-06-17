@@ -1,5 +1,4 @@
 import './App.css';
-import './App.css';
 import Grid from './components/Grid';
 import ScoreBoard from './components/ScoreBoard';
 import TimerBar from './components/TimerBar';
@@ -76,21 +75,27 @@ function App() {
   }, []); // Empty dependency array means this effect runs once on mount and cleanup on unmount
 
   const handleRestart = () => {
-    // Placeholder for restart logic
-    // console.log("Restarting game..."); // Removed
+    // 게임 상태 초기화
     setScore(0);
     setTimeLeft(INITIAL_TIME_LEFT); // Reset timeLeft to INITIAL_TIME_LEFT
-    setIsPaused(false);
     setCurrentSum(0);
-    setGameState('Playing'); // 다른 상태 설정 후, gridKey 설정 전에 gameState 변경
-    setGridKey(prevKey => prevKey + 1); // Grid 컴포넌트 리셋
+    setIsPaused(false); // 일시정지 상태 해제
+
+    // Grid 컴포넌트 리셋을 위한 key 변경
+    // setGridKey 호출 전에 다른 상태들이 먼저 업데이트되도록 함
+    setGridKey(prevKey => prevKey + 1);
+
+    // 게임 상태를 'Playing'으로 변경
+    // 모든 상태 초기화 및 Grid 리셋 준비 후 게임 시작
+    setGameState('Playing');
   };
 
   const handleMainMenu = () => {
     setGameState('StartScreen');
     setIsPaused(true); // 게임이 정지된 상태로 시작 화면으로 돌아가도록
-    // setCurrentSum(0); // 선택적 초기화 주석 처리 유지
-    // setTimeLeft(INITIAL_TIME_LEFT); // 선택적 초기화 주석 처리 유지
+    setScore(0); // 점수 초기화
+    setTimeLeft(INITIAL_TIME_LEFT); // 남은 시간 초기화
+    setCurrentSum(0); // 현재 합계 초기화
   };
 
   const handlePauseToggle = () => {
@@ -115,7 +120,7 @@ function App() {
               <TimerBar timeLeft={timeLeft} />
               <SumDisplay sum={currentSum} />
             </div>
-            <Grid setScore={setScore} setCurrentSum={setCurrentSum} key={gridKey} onGameWin={handleGameWin} /> {/* onGameWin 추가 */}
+            <Grid setScore={setScore} setCurrentSum={setCurrentSum} key={gridKey} onGameWin={handleGameWin} isPaused={isPaused} /> {/* onGameWin 추가, isPaused prop 추가 */}
           </main>
           <footer className="app-controls">
             <Controls

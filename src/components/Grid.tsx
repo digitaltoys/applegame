@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react'; // Added useRef
-import React, { useState, useEffect, useRef } from 'react'; // Added useRef
 import './Grid.css';
 
 interface GridProps {
   setScore: React.Dispatch<React.SetStateAction<number>>;
   setCurrentSum: React.Dispatch<React.SetStateAction<number>>;
   onGameWin: () => void;
+  isPaused: boolean; // isPaused prop 추가
 }
 
 // 셀의 좌표를 나타내는 인터페이스
@@ -71,7 +71,7 @@ const getCellCoordsFromEvent = (event: React.MouseEvent<HTMLDivElement> | React.
 };
 
 
-const Grid: React.FC<GridProps> = ({ setScore, setCurrentSum, onGameWin }) => {
+const Grid: React.FC<GridProps> = ({ setScore, setCurrentSum, onGameWin, isPaused }) => {
   const [gridData, setGridData] = useState<(number | string)[][]>([]);
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [dragStartCell, setDragStartCell] = useState<CellPosition | null>(null);
@@ -106,7 +106,7 @@ const Grid: React.FC<GridProps> = ({ setScore, setCurrentSum, onGameWin }) => {
       setIsDragging(true);
       setDragStartCell(coords);
       setSelectedApples([{ row: coords.row, col: coords.col, value: numericValue }]); // Select starting cell
-      onSumChange(numericValue); // Update sum in App.tsx
+      setCurrentSum(numericValue); // Update sum in App.tsx
       setDragCurrentCell(coords);
     }
   };
@@ -203,7 +203,7 @@ const Grid: React.FC<GridProps> = ({ setScore, setCurrentSum, onGameWin }) => {
       setIsDragging(true);
       setDragStartCell(coords);
       setSelectedApples([{ row: coords.row, col: coords.col, value: numericValue }]);
-      onSumChange(numericValue); // Update sum in App.tsx
+      setCurrentSum(numericValue); // Update sum in App.tsx
       setDragCurrentCell(coords);
     }
   };
@@ -237,7 +237,7 @@ const Grid: React.FC<GridProps> = ({ setScore, setCurrentSum, onGameWin }) => {
       }
       setSelectedApples(newSelectedApples);
       const sum = newSelectedApples.reduce((acc, apple) => acc + apple.value, 0);
-      onSumChange(sum); // Update sum in App.tsx in real-time
+      setCurrentSum(sum); // Update sum in App.tsx in real-time
     }
   };
 
@@ -255,10 +255,10 @@ const Grid: React.FC<GridProps> = ({ setScore, setCurrentSum, onGameWin }) => {
       });
       setGridData(newGridData);
       setSelectedApples([]);
-      onSumChange(0); // Reset sum display in App.tsx
+      setCurrentSum(0); // Reset sum display in App.tsx
     } else {
       setSelectedApples([]);
-      onSumChange(0); // Reset sum display in App.tsx
+      setCurrentSum(0); // Reset sum display in App.tsx
     }
 
     setSelectedApples([]); // Clear selection regardless of sum
