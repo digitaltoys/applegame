@@ -13,3 +13,14 @@
   cursor: pointer;
   margin-top: 20px;
 }
+
+@media (max-width: 768px) {
+  .start-screen h1 { /* Assuming there might be an h1 in StartScreen.tsx */
+    font-size: 2rem; /* Adjust if an h1 exists and needs specific sizing */
+  }
+
+  .start-button {
+    padding: 12px 25px; /* Slightly adjust padding */
+    font-size: 1.3rem;  /* Reduced font size */
+  }
+}

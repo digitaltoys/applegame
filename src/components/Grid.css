@@ -31,3 +31,38 @@
   font-weight: bold;
   text-align: center; /* Center the text */
 }
+
+@media (max-width: 768px) {
+  .grid-container {
+    grid-template-columns: repeat(10, 36px); /* Reduced cell size for 10 columns */
+    grid-template-rows: repeat(10, 36px);    /* Reduced cell size for 10 rows */
+    margin: 10px auto; /* Adjust margin for smaller screens */
+    /* Consider overflow-x: auto; if it might still be too wide for very small screens,
+       though ideally, it should fit. */
+  }
+
+  .grid-cell {
+    width: 30px;  /* Reduced cell width */
+    height: 30px; /* Reduced cell height */
+    font-size: 0.9em; /* Reduced font size in cells */
+    color: black; /* Change apple number color to black on mobile */
+  }
+
+  /* If .sum-display is part of the grid component and needs adjustment */
+  .sum-display {
+    font-size: 0.9em; /* Example: adjust font size if needed */
+  }
+}
+
+@media (max-width: 375px) { /* Further adjustments for very small screens */
+  .grid-container {
+    grid-template-columns: repeat(10, 25px); /* Further reduced cell size */
+    grid-template-rows: repeat(10, 25px);    /* Further reduced cell size */
+  }
+
+  .grid-cell {
+    width: 25px;
+    height: 25px;
+    font-size: 0.8em;
+  }
+}

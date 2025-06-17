@@ -4,6 +4,7 @@
   flex-direction: column;
   align-items: center;
   font-family: sans-serif;
+  width: 100vw;
   min-height: 100vh;
   background-color: #f0f0f0; /* Light gray background */
   user-select: none;
@@ -44,15 +45,53 @@
 /* Grid will take up remaining space, ensure it's styled in Grid.css */
 
 .app-controls {
-  padding: 15px;
+  padding: 5px;
   background-color: #fff; /* White background for controls */
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  margin-top: 20px; /* Space above controls */
+  margin-top: 5px; /* Space above controls */
 }
 
 /* Basic h1 styling if not already present */
 h1 {
   margin: 0;
   font-size: 1.5em;
+}
+
+@media (max-width: 768px) {
+  .app-container {
+    /* Ensure .app-container itself does not have horizontal padding
+       that would prevent content from reaching screen edges on mobile.
+       It doesn't have padding currently, so this is more of a confirmation. */
+    /* padding-left: 0; padding-right: 0; */
+  }
+
+  .game-area {
+    flex-direction: column;
+    align-items: center; /* Center items in column layout */
+    padding: 10px 0; /* Reduce padding, remove horizontal padding for full width */
+    gap: 10px; /* Reduce gap for tighter mobile layout */
+    /* width: 100%; is already set, max-width will be respected */
+  }
+
+  .game-info {
+    width: 100%; /* Make game-info take full width of its column part */
+    min-width: auto; /* Override min-width for smaller screens */
+    align-items: stretch; /* Stretch info content like score, etc. */
+    padding: 10px; /* Reduce padding */
+    gap: 10px; /* Reduce gap between items in game-info */
+    box-sizing: border-box; /* Ensure padding doesn't add to width */
+  }
+
+  /* Assuming grid will naturally take full width or is handled in Grid.css for responsiveness.
+     If .grid-container is directly inside .game-area, it will now be centered by align-items:center.
+     If it needs to be full width, its own styles should ensure that (e.g. width: 100% or width: auto).
+  */
+  /* If .grid-container or similar needs specific width adjustments in App.css for mobile: */
+  /*
+  .grid-container { // Example, if such a class were styled here for layout
+    width: 90%;
+    margin-top: 10px; // Adjust spacing if needed
+  }
+  */
 }
