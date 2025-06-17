@@ -45,6 +45,7 @@
     width: 30px;  /* Reduced cell width */
     height: 30px; /* Reduced cell height */
     font-size: 0.9em; /* Reduced font size in cells */
+    color: black; /* Change apple number color to black on mobile */
   }
 
   /* If .sum-display is part of the grid component and needs adjustment */

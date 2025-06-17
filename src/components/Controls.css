@@ -19,16 +19,19 @@
 
 @media (max-width: 768px) {
   .controls {
-    flex-direction: column; /* Stack buttons vertically */
-    align-items: stretch; /* Make buttons take full width of their container */
+    flex-direction: row; /* Revert to horizontal layout */
+    justify-content: space-around; /* Distribute buttons */
+    align-items: center; /* Align items vertically if they wrap and have different heights */
+    /* gap: 5px; */ /* Adjust gap if needed, space-around might be enough */
   }
 
   .controls button {
-    width: 100%; /* Make buttons take full width */
-    margin-bottom: 10px; /* Add some space between stacked buttons */
+    width: auto; /* Revert width from 100% */
+    margin-bottom: 0; /* Remove bottom margin */
+    padding: 8px 10px; /* Adjust padding for smaller buttons */
+    font-size: 0.85em; /* Adjust font size for smaller buttons */
+    /* Buttons will take their content width. If too many, they will wrap. */
   }
 
-  .controls button:last-child {
-    margin-bottom: 0; /* No margin for the last button */
-  }
+  /* .controls button:last-child remains unchanged from its original state (no specific margin) */
 }
