@@ -60,9 +60,24 @@ function App() {
     // 추가적으로 게임 승리 상태를 저장하거나 다른 로직을 수행할 수 있습니다.
   };
 
+  // useEffect for keyboard controls (pause/resume)
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape" || event.key.toLowerCase() === "p") {
+        handlePauseToggle();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []); // Empty dependency array means this effect runs once on mount and cleanup on unmount
+
   const handleRestart = () => {
     // Placeholder for restart logic
-    console.log("Restarting game...");
+    // console.log("Restarting game..."); // Removed
     setScore(0);
     setTimeLeft(INITIAL_TIME_LEFT); // Reset timeLeft to INITIAL_TIME_LEFT
     setIsPaused(false);
@@ -81,7 +96,7 @@ function App() {
   const handlePauseToggle = () => {
     if (gameState !== 'Playing') return;
     // Placeholder for pause/resume logic
-    console.log("Toggling pause...");
+    // console.log("Toggling pause..."); // Removed
     setIsPaused(!isPaused);
   };
 
