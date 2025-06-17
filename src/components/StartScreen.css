@@ -3,8 +3,11 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  width: 100vw;
   height: 100vh; /* 전체 화면 높이 */
   text-align: center;
+  color: white;
+  background-color: black;
 }
 
 .start-button {
@@ -12,6 +15,8 @@
   font-size: 1.5rem;
   cursor: pointer;
   margin-top: 20px;
+  color: white;
+  background-color: blue;
 }
 
 @media (max-width: 768px) {
