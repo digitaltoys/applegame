@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import './StartScreen.css';
-import Leaderboard from './Leaderboard'; // Import Leaderboard component
 
 // Define the structure of a score entry from CouchDB view
 interface ScoreEntry {
@@ -17,10 +16,13 @@ interface StartScreenProps {
 }
 
 const StartScreen: React.FC<StartScreenProps> = ({ onStartGame }) => {
-  const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [leaderboardData, setLeaderboardData] = useState<ScoreEntry[]>([]);
+  const [leaderboardError, setLeaderboardError] = useState<string | null>(null);
+  const [isLoadingLeaderboard, setIsLoadingLeaderboard] = useState<boolean>(false);
 
   const handleFetchLeaderboard = async () => {
+    setIsLoadingLeaderboard(true);
+    setLeaderboardError(null);
     // Assuming the CouchDB view is set up at:
     // http://couchdb.ioplug.net/scoredb/_design/scores/_view/by_score?descending=true&limit=10
     const url = 'http://couchdb.ioplug.net/scoredb/_design/scores/_view/by_score?descending=true&limit=10';
@@ -49,18 +51,19 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStartGame }) => {
       const data = await response.json();
       // The actual scores are in data.rows
       setLeaderboardData(data.rows || []);
-      setShowLeaderboard(true);
     } catch (error) {
       console.error("Error fetching leaderboard:", error);
-      // Optionally, inform the user with an alert or a message on the screen
-      alert(`Could not load leaderboard data. Please try again later.\nError: ${error instanceof Error ? error.message : String(error)}`);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      setLeaderboardError(`Could not load leaderboard data. Please try again later. Error: ${errorMessage}`);
       setLeaderboardData([]); // Clear data on error
+    } finally {
+      setIsLoadingLeaderboard(false);
     }
   };
 
-  const handleCloseLeaderboard = () => {
-    setShowLeaderboard(false);
-  };
+  useEffect(() => {
+    handleFetchLeaderboard();
+  }, []);
 
   return (
     <div className="start-screen">
@@ -68,12 +71,37 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStartGame }) => {
       <button onClick={onStartGame} className="start-button">
         Start Game
       </button>
-      <button onClick={handleFetchLeaderboard} className="leaderboard-button">
-        View Leaderboard
-      </button>
-      {showLeaderboard && (
-        <Leaderboard scores={leaderboardData} onClose={handleCloseLeaderboard} />
-      )}
+
+      <div className="leaderboard-container-inline">
+        <h2>Leaderboard</h2>
+        {isLoadingLeaderboard && <p className="leaderboard-message">Loading leaderboard...</p>}
+        {leaderboardError && <p className="leaderboard-message error">{leaderboardError}</p>}
+        {!isLoadingLeaderboard && !leaderboardError && leaderboardData.length === 0 && (
+          <p className="leaderboard-message">No scores yet...</p>
+        )}
+        {!isLoadingLeaderboard && !leaderboardError && leaderboardData.length > 0 && (
+          <table className="leaderboard-table-inline">
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>Name</th>
+                <th>Score</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {leaderboardData.map((score, index) => (
+                <tr key={score.id || index}>
+                  <td>{index + 1}</td>
+                  <td>{score.value.name}</td>
+                  <td>{score.key}</td>
+                  <td>{score.value.createdAt ? new Date(score.value.createdAt).toLocaleDateString() : 'N/A'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
     </div>
   );
 };

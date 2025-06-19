@@ -50,3 +50,77 @@
     font-size: 1.1rem; /* Adjust font size for mobile */
   }
 }
+
+/* Styles for the inline leaderboard */
+.leaderboard-container-inline {
+  margin-top: 30px;
+  width: 80%;
+  max-width: 600px;
+  background-color: rgba(255, 255, 255, 0.1); /* Slightly transparent background */
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.leaderboard-container-inline h2 {
+  margin-bottom: 15px;
+  color: #fff;
+}
+
+.leaderboard-table-inline {
+  width: 100%;
+  border-collapse: collapse;
+  color: #ddd; /* Light text color for table content */
+}
+
+.leaderboard-table-inline th,
+.leaderboard-table-inline td {
+  border: 1px solid #555; /* Darker borders for the table */
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.leaderboard-table-inline th {
+  background-color: #333; /* Dark background for headers */
+  color: #fff;
+}
+
+.leaderboard-table-inline tbody tr:nth-child(odd) {
+  background-color: rgba(255, 255, 255, 0.05); /* Slightly lighter for odd rows */
+}
+
+.leaderboard-table-inline tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.15); /* Highlight on hover */
+}
+
+.leaderboard-message {
+  margin-top: 10px;
+  font-size: 1.1rem;
+  color: #ccc;
+}
+
+.leaderboard-message.error {
+  color: #ff6b6b; /* A distinct error color */
+  font-weight: bold;
+}
+
+/* Responsive adjustments for the inline leaderboard */
+@media (max-width: 768px) {
+  .leaderboard-container-inline {
+    width: 90%;
+    padding: 15px;
+  }
+
+  .leaderboard-table-inline th,
+  .leaderboard-table-inline td {
+    padding: 6px 8px;
+    font-size: 0.9rem;
+  }
+
+  .leaderboard-container-inline h2 {
+    font-size: 1.5rem;
+  }
+
+  .leaderboard-message {
+    font-size: 1rem;
+  }
+}
