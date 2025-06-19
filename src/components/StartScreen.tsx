@@ -26,9 +26,15 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStartGame }) => {
     const url = 'http://couchdb.ioplug.net/scoredb/_design/scores/_view/by_score?descending=true&limit=10';
 
     try {
-      const response = await fetch(url);
+      const response = await fetch(url, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Basic ${btoa('user1:any')}`, // Replace with actual credentials
+          }
+      });
       if (!response.ok) {
-        let errorMsgText = await response.text(); // Get raw error text
+        const errorMsgText = await response.text(); // Get raw error text
         let errorDetail = "";
         try {
             // Try to parse as JSON for structured CouchDB errors

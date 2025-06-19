@@ -25,7 +25,7 @@ const GameOverScreen: React.FC<GameOverScreenProps> = ({ score, onRestart, onMai
     }
   }, [score, highScore]);
 
-  const handleSaveScore = () => {
+  const handleSaveScore = async () => {
     if (!playerName.trim()) {
       alert('이름을 입력해주세요!');
       return;
@@ -75,6 +75,7 @@ const GameOverScreen: React.FC<GameOverScreenProps> = ({ score, onRestart, onMai
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            'Authorization': `Basic ${btoa('user1:any')}`, // Replace with actual credentials
           },
           body: JSON.stringify(scoreDataForDb),
         });
