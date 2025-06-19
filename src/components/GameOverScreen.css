@@ -8,6 +8,7 @@
   text-align: center;
   background-color: rgba(0, 0, 0, 0.8); /* 약간 어두운 배경 */
   color: white;
+  overflow-y: auto; /* Allow scrolling if content exceeds viewport height */
 }
 
 .game-over-screen h1 {
@@ -22,6 +23,7 @@
 
 .buttons {
   margin-top: 30px;
+  margin-bottom: 20px; /* Add some space at the bottom */
 }
 
 .buttons button {
@@ -131,46 +133,95 @@
   box-sizing: border-box;
 }
 
+/* Styles for the inline leaderboard (copied from StartScreen.css) */
+.leaderboard-container-inline {
+  margin-top: 30px;
+  width: 80%;
+  max-width: 600px; /* Same as StartScreen for consistency */
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.leaderboard-container-inline h2 {
+  margin-bottom: 15px;
+  color: #fff;
+}
+
+.leaderboard-table-inline {
+  width: 100%;
+  border-collapse: collapse;
+  color: #ddd;
+}
+
+.leaderboard-table-inline th,
+.leaderboard-table-inline td {
+  border: 1px solid #555;
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.leaderboard-table-inline th {
+  background-color: #333;
+  color: #fff;
+}
+
+.leaderboard-table-inline tbody tr:nth-child(odd) {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.leaderboard-table-inline tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.leaderboard-message {
+  margin-top: 10px;
+  font-size: 1.1rem;
+  color: #ccc;
+}
+
+.leaderboard-message.error {
+  color: #ff6b6b;
+  font-weight: bold;
+}
+
+
 @media (max-width: 768px) {
   .game-over-screen {
-    /* Adjust height if 100vh is too much on mobile with browser chrome,
-       or rely on main app container scrolling if that's preferred.
-       For a modal-like screen, 100vh might still be intended. */
-    padding: 20px; /* Add some padding for smaller screens */
-    width: 100vw; /* Make the container span the full viewport width */
-    box-sizing: border-box; /* Ensure padding/border don't add to width */
+    padding: 15px; /* Slightly reduced padding */
+    width: 100vw;
+    box-sizing: border-box;
   }
 
   .game-over-screen h1 {
-    font-size: 2.2rem; /* Reduced font size */
+    font-size: 2.0rem; /* Further reduced for more space */
   }
 
   .score-summary p {
-    font-size: 1.3rem; /* Reduced font size */
+    font-size: 1.2rem; /* Reduced font size */
   }
 
   .buttons {
     display: flex;
-    flex-direction: column; /* Stack buttons */
-    align-items: center; /* Center stacked buttons */
-    gap: 15px; /* Space between stacked buttons */
-    width: 100%; /* Ensure buttons container takes width */
+    flex-direction: column;
+    align-items: center;
+    gap: 10px; /* Reduced gap */
+    width: 100%;
   }
 
   .buttons button {
-    width: 80%; /* Set width for stacked buttons */
-    margin: 0; /* Remove horizontal margins */
-    padding: 12px 15px; /* Adjust padding */
-    font-size: 1.1rem; /* Adjust font size */
+    width: 70%; /* Slightly reduced width */
+    margin: 0;
+    padding: 10px 12px; /* Adjust padding */
+    font-size: 1.0rem; /* Adjust font size */
   }
 
   .save-score-container {
-    width: 90%; /* Wider container on small screens */
+    width: 90%;
   }
 
   .save-score-section {
-    flex-direction: column; /* Stack input and button on smaller screens */
-    /* width: 100%; */ /* Already set to 100% of parent */
+    flex-direction: column;
   }
 
   .save-score-section input[type="text"] {
@@ -189,5 +240,26 @@
 
   .score-display-after-save {
     font-size: 1.1rem;
+  }
+
+  /* Responsive adjustments for the inline leaderboard (copied from StartScreen.css) */
+  .leaderboard-container-inline {
+    width: 90%; /* Match other containers on small screens */
+    padding: 15px;
+    margin-top: 20px; /* Adjust margin */
+  }
+
+  .leaderboard-table-inline th,
+  .leaderboard-table-inline td {
+    padding: 6px 8px;
+    font-size: 0.85rem; /* Slightly smaller for game over screen */
+  }
+
+  .leaderboard-container-inline h2 {
+    font-size: 1.3rem; /* Slightly smaller */
+  }
+
+  .leaderboard-message {
+    font-size: 0.9rem; /* Match other messages */
   }
 }
