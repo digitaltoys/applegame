@@ -70,6 +70,7 @@
   border-radius: 4px;
   color: #333;
   flex-grow: 1; /* Allow input to take available space */
+  background-color: white;
 }
 
 .save-score-section input[type="text"]:disabled {
