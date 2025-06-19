@@ -9,7 +9,7 @@ import StartScreen from './components/StartScreen'; // 추가
 import GameOverScreen from './components/GameOverScreen'; // 추가
 
 // Define INITIAL_TIME_LEFT constant
-const INITIAL_TIME_LEFT = 60;
+const INITIAL_TIME_LEFT = 960;
 
 type GameState = 'StartScreen' | 'Playing' | 'GameOver';
 
@@ -118,6 +118,7 @@ function App() {
             <div className="game-info">
               <ScoreBoard score={score} />
               <TimerBar timeLeft={timeLeft} />
+              <div className='comment'>합이 10이되게 모드세요</div>
               <SumDisplay sum={currentSum} />
             </div>
             <Grid setScore={setScore} setCurrentSum={setCurrentSum} key={gridKey} onGameWin={handleGameWin} isPaused={isPaused} /> {/* onGameWin 추가, isPaused prop 추가 */}

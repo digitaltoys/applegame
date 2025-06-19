@@ -162,7 +162,7 @@ const Grid: React.FC<GridProps> = ({ setScore, setCurrentSum, onGameWin, isPause
         newGridData[apple.row][apple.col] = ''; // Remove apples
       });
       setGridData(newGridData);
-      setCurrentSum(0); // Reset sum display in App.tsx
+      // setCurrentSum(0); // Reset sum display in App.tsx
       setSelectedApples([]);
       //onSumChange(0); // Reset sum display in App.tsx
 
@@ -175,7 +175,7 @@ const Grid: React.FC<GridProps> = ({ setScore, setCurrentSum, onGameWin, isPause
     } else {
       // If sum is not 10, just clear selection and reset sum display
       setSelectedApples([]);
-      setCurrentSum(0); // Reset sum display in App.tsx
+      // setCurrentSum(0); // Reset sum display in App.tsx
       //onSumChange(0); // Reset sum display in App.tsx
     }
 
@@ -255,10 +255,10 @@ const Grid: React.FC<GridProps> = ({ setScore, setCurrentSum, onGameWin, isPause
       });
       setGridData(newGridData);
       setSelectedApples([]);
-      setCurrentSum(0); // Reset sum display in App.tsx
+      // setCurrentSum(0); // Reset sum display in App.tsx
     } else {
       setSelectedApples([]);
-      setCurrentSum(0); // Reset sum display in App.tsx
+      // setCurrentSum(0); // Reset sum display in App.tsx
     }
 
     setSelectedApples([]); // Clear selection regardless of sum
