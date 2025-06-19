@@ -19,6 +19,22 @@
   background-color: blue;
 }
 
+.leaderboard-button {
+  padding: 10px 20px;
+  font-size: 1.2rem; /* Slightly smaller than start button */
+  cursor: pointer;
+  margin-top: 15px; /* Space from start button */
+  color: white;
+  background-color: #6c757d; /* A different color, e.g., gray */
+  border: none;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.leaderboard-button:hover {
+  background-color: #5a6268;
+}
+
 @media (max-width: 768px) {
   .start-screen h1 { /* Assuming there might be an h1 in StartScreen.tsx */
     font-size: 2rem; /* Adjust if an h1 exists and needs specific sizing */
@@ -27,5 +43,10 @@
   .start-button {
     padding: 12px 25px; /* Slightly adjust padding */
     font-size: 1.3rem;  /* Reduced font size */
+  }
+
+  .leaderboard-button {
+    padding: 10px 20px;
+    font-size: 1.1rem; /* Adjust font size for mobile */
   }
 }

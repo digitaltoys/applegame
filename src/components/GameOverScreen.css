@@ -43,6 +43,36 @@
   color: white;
 }
 
+.save-score-section {
+  margin: 20px 0;
+  display: flex; /* Align input and button horizontally */
+  align-items: center; /* Vertically align items in the center */
+  justify-content: center; /* Horizontally center items if they don't fill the width */
+  gap: 10px; /* Space between input and button */
+}
+
+.player-name-input {
+  padding: 10px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  color: #333; /* 입력 텍스트 색상 추가 */
+}
+
+.save-score-button {
+  padding: 10px 20px;
+  font-size: 1rem;
+  cursor: pointer;
+  background-color: #007bff; /* 파란색 계열 */
+  color: white;
+  border: none;
+  border-radius: 5px;
+}
+
+.save-score-button:hover {
+  background-color: #0056b3;
+}
+
 @media (max-width: 768px) {
   .game-over-screen {
     /* Adjust height if 100vh is too much on mobile with browser chrome,
@@ -74,5 +104,22 @@
     margin: 0; /* Remove horizontal margins */
     padding: 12px 15px; /* Adjust padding */
     font-size: 1.1rem; /* Adjust font size */
+  }
+
+  .save-score-section {
+    flex-direction: column; /* Stack input and button on smaller screens */
+    width: 80%; /* Match button width for consistency */
+    margin-left: auto; /* Center the section */
+    margin-right: auto; /* Center the section */
+  }
+
+  .player-name-input {
+    width: 100%; /* Full width within its container */
+    margin-bottom: 10px; /* Space when stacked */
+    box-sizing: border-box; /* Ensure padding doesn't add to width */
+  }
+
+  .save-score-button {
+    width: 100%; /* Full width button */
   }
 }

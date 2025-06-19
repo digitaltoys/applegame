@@ -1,0 +1,82 @@
+.leaderboard-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.75);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.leaderboard-container {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  width: 80%;
+  max-width: 500px;
+  max-height: 80vh;
+  overflow-y: auto;
+  color: #333;
+}
+
+.leaderboard-container h2 {
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #007bff;
+}
+
+.leaderboard-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.leaderboard-table th,
+.leaderboard-table td {
+  border: 1px solid #ddd;
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.leaderboard-table th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+
+.leaderboard-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.leaderboard-table td.rank {
+  width: 50px;
+  text-align: center;
+}
+
+.leaderboard-table td.score {
+  width: 80px;
+  text-align: right;
+}
+
+.close-button-container {
+  text-align: center; /* Center the button */
+}
+
+.leaderboard-close-button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.leaderboard-close-button:hover {
+  background-color: #0056b3;
+}
