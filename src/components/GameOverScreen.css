@@ -43,34 +43,92 @@
   color: white;
 }
 
-.save-score-section {
+/* Container for score saving UI elements */
+.save-score-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   margin: 20px 0;
-  display: flex; /* Align input and button horizontally */
-  align-items: center; /* Vertically align items in the center */
-  justify-content: center; /* Horizontally center items if they don't fill the width */
-  gap: 10px; /* Space between input and button */
+  width: 80%;
+  max-width: 400px; /* Max width for the save score area */
 }
 
-.player-name-input {
+.save-score-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%; /* Take full width of parent .save-score-container */
+}
+
+.save-score-section input[type="text"] {
   padding: 10px;
   font-size: 1rem;
   border: 1px solid #ccc;
   border-radius: 4px;
-  color: #333; /* 입력 텍스트 색상 추가 */
+  color: #333;
+  flex-grow: 1; /* Allow input to take available space */
 }
 
-.save-score-button {
+.save-score-section input[type="text"]:disabled {
+  background-color: #eee;
+  cursor: not-allowed;
+}
+
+.save-score-section button {
   padding: 10px 20px;
   font-size: 1rem;
   cursor: pointer;
-  background-color: #007bff; /* 파란색 계열 */
+  background-color: #007bff;
   color: white;
   border: none;
   border-radius: 5px;
 }
 
-.save-score-button:hover {
+.save-score-section button:hover {
   background-color: #0056b3;
+}
+
+.save-score-section button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.save-status-message {
+  margin-top: 15px;
+  font-size: 1rem;
+  padding: 10px;
+  border-radius: 5px;
+  width: 100%; /* Make message take full width of container */
+  box-sizing: border-box; /* Include padding in width */
+  text-align: center;
+}
+
+.save-status-message.success {
+  background-color: #28a745; /* Green for success */
+  color: white;
+}
+
+.save-status-message.error {
+  background-color: #dc3545; /* Red for error */
+  color: white;
+}
+
+.save-status-message.info {
+  background-color: #17a2b8; /* Blue for info (like 'Saving...') */
+  color: white;
+}
+
+.score-display-after-save {
+  margin-top: 10px; /* Or use .save-status-message margin */
+  font-size: 1.2rem;
+  color: #fff; /* White text */
+  padding: 10px;
+  background-color: rgba(255, 255, 255, 0.1); /* Subtle background */
+  border-radius: 5px;
+  text-align: center;
+  width: 100%; /* Make it take full width of parent */
+  box-sizing: border-box;
 }
 
 @media (max-width: 768px) {
@@ -106,20 +164,30 @@
     font-size: 1.1rem; /* Adjust font size */
   }
 
+  .save-score-container {
+    width: 90%; /* Wider container on small screens */
+  }
+
   .save-score-section {
     flex-direction: column; /* Stack input and button on smaller screens */
-    width: 80%; /* Match button width for consistency */
-    margin-left: auto; /* Center the section */
-    margin-right: auto; /* Center the section */
+    /* width: 100%; */ /* Already set to 100% of parent */
   }
 
-  .player-name-input {
-    width: 100%; /* Full width within its container */
-    margin-bottom: 10px; /* Space when stacked */
-    box-sizing: border-box; /* Ensure padding doesn't add to width */
+  .save-score-section input[type="text"] {
+    width: 100%;
+    margin-bottom: 10px;
+    box-sizing: border-box;
   }
 
-  .save-score-button {
-    width: 100%; /* Full width button */
+  .save-score-section button {
+    width: 100%;
+  }
+
+  .save-status-message {
+    font-size: 0.9rem;
+  }
+
+  .score-display-after-save {
+    font-size: 1.1rem;
   }
 }
