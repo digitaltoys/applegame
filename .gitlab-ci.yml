@@ -1,0 +1,22 @@
+# 파이프라인이 어떤 단계(Stage)들로 구성될지 정의합니다.
+stages:
+  - build
+  - test
+
+# 'build-job'이라는 이름의 작업(Job) 정의
+build-job:
+  stage: build          # 이 작업은 'build' 단계에 속합니다.
+  tags:
+    - docker            # 2단계에서 등록한 Runner의 태그 중 하나를 지정합니다.
+  script:
+    - echo "Compiling the code..."
+    - echo "Compile complete."
+
+# 'test-job'이라는 이름의 작업 정의
+test-job:
+  stage: test           # 이 작업은 'test' 단계에 속합니다.
+  tags:
+    - docker            # 마찬가지로 'docker' 태그가 있는 Runner가 이 작업을 수행합니다.
+  script:
+    - echo "Running tests..."
+    - echo "No tests to run."
