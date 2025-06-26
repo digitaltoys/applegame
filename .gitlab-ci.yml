@@ -17,6 +17,14 @@ build-app:
   image: node:20-alpine # 빌드에 사용할 이미지
   tags:
     - docker # NAS의 Docker Runner를 사용
+  services:  # <<< 이 부분을 추가합니다.
+    - name: docker:20.10.16-dind
+      alias: docker
+  variables: # <<< 이 부분도 추가합니다.
+    # Docker-in-Docker 데몬에 TLS 없이 연결하도록 설정
+    DOCKER_TLS_CERTDIR: ""
+    # Docker 데몬의 주소를 명시적으로 알려줌
+    DOCKER_HOST: tcp://docker:2375
   script:
     - npm install
     - npm run build
