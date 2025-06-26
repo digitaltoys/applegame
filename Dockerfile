@@ -23,7 +23,7 @@ FROM nginx:1.23-alpine
 
 # 1단계(builder)에서 생성된 빌드 결과물(/app/build)을
 # Nginx의 기본 웹 루트 폴더로 복사합니다.
-COPY --from=builder /app/build /usr/share/nginx/html
+COPY --from=builder /app/dist /usr/share/nginx/html
 
 # 위에서 작성한 커스텀 Nginx 설정 파일을 복사합니다.
 COPY ./nginx/default.conf /etc/nginx/conf.d/default.conf
