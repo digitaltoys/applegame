@@ -45,7 +45,7 @@ deploy-app:
 
     # 3. 새로 빌드한 이미지로 컨테이너를 실행합니다.
     - echo "Running new container..."
-    - docker run -d --name $CONTAINER_NAME -p 8081:80 $WEB_IMAGE
+    - docker run -d --name $CONTAINER_NAME -p 62001:80 $WEB_IMAGE
 
     # 4. 사용하지 않는 오래된 Docker 이미지들을 정리합니다. (선택사항이지만 권장)
     - docker image prune -f
