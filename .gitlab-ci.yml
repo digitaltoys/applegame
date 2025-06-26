@@ -9,7 +9,7 @@ variables:
   # $CI_PROJECT_NAME 은 GitLab이 자동으로 넣어주는 프로젝트 이름입니다.
   WEB_IMAGE: $CI_REGISTRY_IMAGE/$CI_PROJECT_NAME:latest
   # 실행할 컨테이너의 이름을 정의합니다.
-  CONTAINER_NAME: my-react-app
+  CONTAINER_NAME: applegame-app
 
 # React 앱 빌드 작업
 build-app:
