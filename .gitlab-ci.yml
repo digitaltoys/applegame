@@ -14,7 +14,7 @@ variables:
 # React 앱 빌드 작업
 build-app:
   stage: build
-  image: node:18-alpine # 빌드에 사용할 이미지
+  image: node:20-alpine # 빌드에 사용할 이미지
   tags:
     - docker # NAS의 Docker Runner를 사용
   script:
