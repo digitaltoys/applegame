@@ -1,22 +1,51 @@
-# 파이프라인이 어떤 단계(Stage)들로 구성될지 정의합니다.
+# .gitlab-ci.yml
+
 stages:
   - build
-  - test
+  - deploy
 
-# 'build-job'이라는 이름의 작업(Job) 정의
-build-job:
-  stage: build          # 이 작업은 'build' 단계에 속합니다.
-  tags:
-    - docker            # 2단계에서 등록한 Runner의 태그 중 하나를 지정합니다.
-  script:
-    - echo "Compiling the code..."
-    - echo "Compile complete."
+variables:
+  # 생성할 Docker 이미지의 이름과 태그를 변수로 정의합니다.
+  # $CI_PROJECT_NAME 은 GitLab이 자동으로 넣어주는 프로젝트 이름입니다.
+  WEB_IMAGE: $CI_REGISTRY_IMAGE/$CI_PROJECT_NAME:latest
+  # 실행할 컨테이너의 이름을 정의합니다.
+  CONTAINER_NAME: applegame-app
 
-# 'test-job'이라는 이름의 작업 정의
-test-job:
-  stage: test           # 이 작업은 'test' 단계에 속합니다.
+# React 앱 빌드 작업
+build-app:
+  stage: build
+  image: node:18-alpine # 빌드에 사용할 이미지
   tags:
-    - docker            # 마찬가지로 'docker' 태그가 있는 Runner가 이 작업을 수행합니다.
+    - docker # NAS의 Docker Runner를 사용
   script:
-    - echo "Running tests..."
-    - echo "No tests to run."
+    - npm install
+    - npm run build
+  artifacts:
+    # 다음 스테이지(deploy)로 'build' 폴더를 전달합니다.
+    paths:
+      - build/
+    expire_in: 1 hour # 아티팩트 보관 시간
+
+# 빌드된 앱을 Nginx 컨테이너로 배포하는 작업
+deploy-app:
+  stage: deploy
+  image: docker:20.10.16 # Docker 명령을 실행하기 위한 이미지
+  tags:
+    - docker # NAS의 Docker Runner를 사용
+  script:
+    # 1. 기존에 실행 중인 앱 컨테이너가 있다면 중지하고 삭제합니다.
+    # '|| true'는 컨테이너가 없어서 에러가 나도 파이프라인이 멈추지 않게 합니다.
+    - echo "Stopping and removing old container..."
+    - docker stop $CONTAINER_NAME || true
+    - docker rm $CONTAINER_NAME || true
+
+    # 2. 프로젝트의 Dockerfile을 사용하여 새 이미지를 빌드합니다.
+    - echo "Building new Docker image..."
+    - docker build -t $WEB_IMAGE .
+
+    # 3. 새로 빌드한 이미지로 컨테이너를 실행합니다.
+    - echo "Running new container..."
+    - docker run -d --name $CONTAINER_NAME -p 62001:80 $WEB_IMAGE
+
+    # 4. 사용하지 않는 오래된 Docker 이미지들을 정리합니다. (선택사항이지만 권장)
+    - docker image prune -f
