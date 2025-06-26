@@ -1,15 +1,10 @@
-# .gitlab-ci.yml
-
 stages:
   - build
   - deploy
 
 variables:
-  # 이미지 이름 형식을 수정합니다.
   WEB_IMAGE: $CI_PROJECT_NAME:latest
   CONTAINER_NAME: applegame-app
-  # Docker-in-Docker 설정을 위해 이 변수를 전역으로 추가합니다.
-  DOCKER_TLS_CERTDIR: ""
 
 build-app:
   stage: build
@@ -21,25 +16,18 @@ build-app:
     - npm run build
   artifacts:
     paths:
-      - build/
-      - dist/ # vite는 dist 폴더를 생성할 수 있으므로 함께 추가
-      - Dockerfile # deploy 단계에서 Dockerfile이 필요하므로 전달
-      - nginx/ # nginx 설정 파일도 전달
-    expire_in: 1 hour
+      - dist/ # vite는 dist 폴더를 생성
+      - Dockerfile
+      - nginx/
 
 deploy-app:
   stage: deploy
-  image: docker:20.10.16
+  # Docker 명령어를 사용하므로 docker 이미지를 사용
+  image: docker:latest
   tags:
     - docker
-  services: # Docker 데몬 서비스 추가
-    - name: docker:20.10.16-dind
-      alias: docker
-  variables: # Docker 데몬 주소 명시
-    DOCKER_HOST: tcp://docker:2375
   script:
-    - echo "Waiting for Docker to start..."
-    - sleep 15 # dind 서비스가 시작될 시간을 줍니다.
+    # 이제 이 명령어들이 호스트의 Docker 데몬에 직접 전달됩니다.
     - echo "Stopping and removing old container..."
     - docker stop $CONTAINER_NAME || true
     - docker rm $CONTAINER_NAME || true
