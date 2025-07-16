@@ -12,10 +12,18 @@
   height: 40px;
   border: 1px solid #eee;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
+  padding-bottom: 1px;
   font-size: 1.2em;
   font-family: sans-serif;
+  font-weight: bold;
+  color: white;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  background-image: url('/icons/apple.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   box-sizing: border-box; /* Ensures padding and border don't increase the cell size */
 }
 
@@ -45,7 +53,11 @@
     width: 30px;  /* Reduced cell width */
     height: 30px; /* Reduced cell height */
     font-size: 0.9em; /* Reduced font size in cells */
-    color: black; /* Change apple number color to black on mobile */
+    color: white; /* Keep white color for better visibility */
+    background-image: url('/icons/apple.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
   }
 
   /* If .sum-display is part of the grid component and needs adjustment */
@@ -64,5 +76,9 @@
     width: 25px;
     height: 25px;
     font-size: 0.8em;
+    background-image: url('/icons/apple.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
   }
 }
