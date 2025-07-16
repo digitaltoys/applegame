@@ -46,6 +46,7 @@ const GameOverScreen: React.FC<GameOverScreenProps> = ({ score, onRestart, onMai
     if (storedName) {
       setPlayerName(storedName);
     }
+    window.scrollTo(0, 0); // 페이지 최상단으로 스크롤
   }, []); // Empty dependency array ensures this runs only once on mount
 
   const handleSaveScore = async () => {
@@ -170,16 +171,10 @@ const GameOverScreen: React.FC<GameOverScreenProps> = ({ score, onRestart, onMai
       } else {
         setHighScore(0); // No scores on the leaderboard
       }
-    } catch (error) {
-      console.error("Error fetching leaderboard:", error);
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      setLeaderboardError(`Could not load leaderboard data. Error: ${errorMessage}`);
-      setLeaderboardData([]);
-      setHighScore(0); // Set high score to 0 on error
     } finally {
       setIsLoadingLeaderboard(false);
     }
-  };
+  }
 
   // Fetch leaderboard when component mounts
   useEffect(() => {

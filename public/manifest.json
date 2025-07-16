@@ -1,0 +1,19 @@
+{
+  "name": "Apple Collector Game",
+  "short_name": "AppleGame",
+  "description": "사과를 모으는 재미있는 게임",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#4ade80",
+  "orientation": "portrait",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/icons/apple.png",
+      "sizes": "256x256",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ]
+}

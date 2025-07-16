@@ -9,7 +9,7 @@ import StartScreen from './components/StartScreen'; // 추가
 import GameOverScreen from './components/GameOverScreen'; // 추가
 
 // Define INITIAL_TIME_LEFT constant
-const INITIAL_TIME_LEFT = 960;
+const INITIAL_TIME_LEFT = 60;
 
 type GameState = 'StartScreen' | 'Playing' | 'GameOver';
 
