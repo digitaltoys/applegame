@@ -1,0 +1,38 @@
+stages:
+  - build
+  - deploy
+
+variables:
+  WEB_IMAGE: $CI_PROJECT_NAME:latest
+  CONTAINER_NAME: applegame-app
+
+build-app:
+  stage: build
+  image: node:20-alpine
+  tags:
+    - docker
+  script:
+    - npm install
+    - npm run build
+  artifacts:
+    paths:
+      - dist/ # vite는 dist 폴더를 생성
+      - Dockerfile
+      - nginx/
+
+deploy-app:
+  stage: deploy
+  # Docker 명령어를 사용하므로 docker 이미지를 사용
+  image: docker:latest
+  tags:
+    - docker
+  script:
+    # 이제 이 명령어들이 호스트의 Docker 데몬에 직접 전달됩니다.
+    - echo "Stopping and removing old container..."
+    - docker stop $CONTAINER_NAME || true
+    - docker rm $CONTAINER_NAME || true
+    - echo "Building new Docker image..."
+    - docker build -t $WEB_IMAGE .
+    - echo "Running new container..."
+    - docker run -d --name $CONTAINER_NAME -p 62001:80 $WEB_IMAGE
+    - docker image prune -f

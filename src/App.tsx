@@ -4,7 +4,7 @@ import ScoreBoard from './components/ScoreBoard';
 import TimerBar from './components/TimerBar';
 import Controls from './components/Controls';
 import SumDisplay from './components/SumDisplay';
-import React, { useState, useEffect } from 'react'; // Import useState and useEffect
+import { useState, useEffect } from 'react'; // Import useState and useEffect
 import StartScreen from './components/StartScreen'; // 추가
 import GameOverScreen from './components/GameOverScreen'; // 추가
 
