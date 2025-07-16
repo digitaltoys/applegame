@@ -28,20 +28,20 @@ a:hover {
 
 html, body {
   height: 100%; /* Ensure html and body take full height */
+  overflow-x: hidden; /* 가로 스크롤만 숨김 */
+  overflow-y: auto; /* 세로 스크롤 허용 */
 }
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
   min-width: 320px;
-  /* min-height: 100vh; is already covered by height: 100% on html and body */
+  /* display: flex와 place-items: center 제거하여 스크롤 허용 */
 }
 
-@media (max-width: 768px) {
-  body {
-    overflow: hidden; /* Prevent scrolling on mobile */
-  }
+#root {
+  width: 100%;
+  min-height: 100vh;
+  /* React root 요소가 전체 화면을 차지하도록 */
 }
 
 h1 {
