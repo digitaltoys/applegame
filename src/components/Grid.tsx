@@ -150,6 +150,9 @@ const Grid: React.FC<GridProps> = ({ setScore, setCurrentSum, onGameWin, isPause
   const handleMouseUp = () => {
     if (!isDragging) return;
     setIsDragging(false);
+    
+    // Re-enable body scroll (in case it was disabled)
+    document.body.style.overflow = 'auto';
 
     const sum = selectedApples.reduce((acc, apple) => acc + apple.value, 0);
     // setCurrentSum(sum); // App.tsx의 setCurrentSum으로 업데이트는 handleMouseMove에서 이미 처리됨
@@ -200,6 +203,9 @@ const Grid: React.FC<GridProps> = ({ setScore, setCurrentSum, onGameWin, isPause
       }
       const numericValue = Number(cellValue);
 
+      // Disable body scroll during drag
+      document.body.style.overflow = 'hidden';
+      
       setIsDragging(true);
       setDragStartCell(coords);
       setSelectedApples([{ row: coords.row, col: coords.col, value: numericValue }]);
@@ -244,6 +250,9 @@ const Grid: React.FC<GridProps> = ({ setScore, setCurrentSum, onGameWin, isPause
   const handleTouchEnd = () => {
     if (!isDragging) return;
     setIsDragging(false);
+    
+    // Re-enable body scroll
+    document.body.style.overflow = 'auto';
 
     const sum = selectedApples.reduce((acc, apple) => acc + apple.value, 0);
 

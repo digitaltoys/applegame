@@ -5,6 +5,7 @@
   border: 1px solid #ccc;
   width: max-content; /* Or a fixed width like 400px + borders */
   margin: 20px auto; /* Center the grid on the page */
+  touch-action: none; /* Prevent scrolling during touch interactions */
 }
 
 .grid-cell {
