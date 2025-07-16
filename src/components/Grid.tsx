@@ -21,7 +21,19 @@ interface SelectedApple extends CellPosition {
 
 const GRID_SIZE = 10;
 
-const generateRandomNumber = () => Math.floor(Math.random() * 9) + 1;
+const generateRandomNumber = () => {
+  // 가중치 설정: 낮은 숫자가 더 자주 나오도록 조정
+  // 1-3: 50%, 4-6: 30%, 7-9: 20%
+  const weights = [20, 15, 15, 10, 10, 10, 7, 7, 6]; // 1-9 순서대로 가중치
+  const totalWeight = weights.reduce((sum, w) => sum + w, 0);
+  let random = Math.random() * totalWeight;
+  
+  for (let i = 0; i < weights.length; i++) {
+    random -= weights[i];
+    if (random <= 0) return i + 1;
+  }
+  return 9; // fallback
+};
 
 const initializeGrid = (): (number | string)[][] => {
   const newGrid: (number | string)[][] = [];
