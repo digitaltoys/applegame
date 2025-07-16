@@ -26,6 +26,8 @@ deploy-app:
   image: docker:latest
   tags:
     - docker
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
   script:
     # 이제 이 명령어들이 호스트의 Docker 데몬에 직접 전달됩니다.
     - echo "Stopping and removing old container..."
