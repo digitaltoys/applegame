@@ -21,7 +21,19 @@ interface SelectedApple extends CellPosition {
 
 const GRID_SIZE = 10;
 
-const generateRandomNumber = () => Math.floor(Math.random() * 9) + 1;
+const generateRandomNumber = () => {
+  // 가중치 설정: 낮은 숫자가 더 자주 나오도록 조정
+  // 1-3: 50%, 4-6: 30%, 7-9: 20%
+  const weights = [20, 15, 15, 10, 10, 10, 7, 7, 6]; // 1-9 순서대로 가중치
+  const totalWeight = weights.reduce((sum, w) => sum + w, 0);
+  let random = Math.random() * totalWeight;
+  
+  for (let i = 0; i < weights.length; i++) {
+    random -= weights[i];
+    if (random <= 0) return i + 1;
+  }
+  return 9; // fallback
+};
 
 const initializeGrid = (): (number | string)[][] => {
   const newGrid: (number | string)[][] = [];
@@ -258,19 +270,23 @@ const Grid: React.FC<GridProps> = ({ setScore, setCurrentSum, onGameWin, isPause
 
     if (sum === 10) {
       setScore(prevScore => prevScore + selectedApples.length);
-      const newGridData = [...gridData];
+      
+      const newGridData = gridData.map(row => [...row]); // Deep copy
       selectedApples.forEach(apple => {
-        newGridData[apple.row][apple.col] = '';
+        newGridData[apple.row][apple.col] = ''; // Remove apples
       });
       setGridData(newGridData);
       setSelectedApples([]);
-      // setCurrentSum(0); // Reset sum display in App.tsx
+      
+      // Check for game win condition (all apples cleared)
+      const remainingApples = newGridData.flat().some(cell => cell !== '' && cell !== 0);
+      if (!remainingApples) {
+        onGameWin(); // Notify App.tsx that the game is won
+      }
     } else {
+      // If sum is not 10, just clear selection
       setSelectedApples([]);
-      // setCurrentSum(0); // Reset sum display in App.tsx
     }
-
-    setSelectedApples([]); // Clear selection regardless of sum
     setDragStartCell(null);
     setDragCurrentCell(null);
     // isDragging은 이미 false로 설정됨
@@ -282,10 +298,11 @@ const Grid: React.FC<GridProps> = ({ setScore, setCurrentSum, onGameWin, isPause
     for (let i = 0; i < GRID_SIZE; i++) {
       for (let j = 0; j < GRID_SIZE; j++) {
         const isSelected = selectedApples.some(apple => apple.row === i && apple.col === j);
+        const isEmpty = gridData[i][j] === '' || gridData[i][j] === 0;
         cells.push(
           <div
             key={`${i}-${j}`}
-            className={`grid-cell ${isSelected ? 'selected-apple' : ''}`}
+            className={`grid-cell ${isSelected ? 'selected-apple' : ''} ${isEmpty ? 'empty' : ''}`}
             data-row={i}
             data-col={j}
           >
