@@ -285,10 +285,11 @@ const Grid: React.FC<GridProps> = ({ setScore, setCurrentSum, onGameWin, isPause
     for (let i = 0; i < GRID_SIZE; i++) {
       for (let j = 0; j < GRID_SIZE; j++) {
         const isSelected = selectedApples.some(apple => apple.row === i && apple.col === j);
+        const isEmpty = gridData[i][j] === '' || gridData[i][j] === 0;
         cells.push(
           <div
             key={`${i}-${j}`}
-            className={`grid-cell ${isSelected ? 'selected-apple' : ''}`}
+            className={`grid-cell ${isSelected ? 'selected-apple' : ''} ${isEmpty ? 'empty' : ''}`}
             data-row={i}
             data-col={j}
           >
