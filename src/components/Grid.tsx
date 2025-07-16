@@ -261,19 +261,23 @@ const Grid: React.FC<GridProps> = ({ setScore, setCurrentSum, onGameWin, isPause
 
     if (sum === 10) {
       setScore(prevScore => prevScore + selectedApples.length);
-      const newGridData = [...gridData];
+      
+      const newGridData = gridData.map(row => [...row]); // Deep copy
       selectedApples.forEach(apple => {
-        newGridData[apple.row][apple.col] = '';
+        newGridData[apple.row][apple.col] = ''; // Remove apples
       });
       setGridData(newGridData);
       setSelectedApples([]);
-      // setCurrentSum(0); // Reset sum display in App.tsx
+      
+      // Check for game win condition (all apples cleared)
+      const remainingApples = newGridData.flat().some(cell => cell !== '' && cell !== 0);
+      if (!remainingApples) {
+        onGameWin(); // Notify App.tsx that the game is won
+      }
     } else {
+      // If sum is not 10, just clear selection
       setSelectedApples([]);
-      // setCurrentSum(0); // Reset sum display in App.tsx
     }
-
-    setSelectedApples([]); // Clear selection regardless of sum
     setDragStartCell(null);
     setDragCurrentCell(null);
     // isDragging은 이미 false로 설정됨
