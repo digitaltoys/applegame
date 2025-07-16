@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import './GameOverScreen.css'; // CSS 파일도 생성 예정
+import { notifyLeaderboardUpdate } from '../utils/notifications';
 
 // Copied from StartScreen.tsx
 interface ScoreEntry {
@@ -27,6 +28,9 @@ const GameOverScreen: React.FC<GameOverScreenProps> = ({ score, onRestart, onMai
   const [leaderboardData, setLeaderboardData] = useState<ScoreEntry[]>([]);
   const [leaderboardError, setLeaderboardError] = useState<string | null>(null);
   const [isLoadingLeaderboard, setIsLoadingLeaderboard] = useState<boolean>(false);
+  
+  // Track previous leaderboard leader for notification
+  const [previousLeader, setPreviousLeader] = useState<{name: string, score: number} | null>(null);
 
   // This useEffect is now only for updating the *local* personal best.
   // The displayed highScore state is set by handleFetchLeaderboard.
@@ -131,12 +135,12 @@ const GameOverScreen: React.FC<GameOverScreenProps> = ({ score, onRestart, onMai
       setSaveMessage('로컬 점수 저장 중 오류가 발생했습니다.');
       setIsScoreSaved(false);
     }
-    // After saving, fetch the leaderboard again to show the latest scores
-    handleFetchLeaderboard();
+    // After saving, fetch the leaderboard again to show the latest scores and check for leader change
+    handleFetchLeaderboard(true);
   };
 
   // handleFetchLeaderboard - Copied and adapted from StartScreen.tsx
-  const handleFetchLeaderboard = async () => {
+  const handleFetchLeaderboard = async (checkForLeaderChange: boolean = false) => {
     setIsLoadingLeaderboard(true);
     setLeaderboardError(null);
     const url = 'http://couchdb.ioplug.net/scoredb/_design/scores/_view/by_score?descending=true&limit=10';
@@ -168,9 +172,35 @@ const GameOverScreen: React.FC<GameOverScreenProps> = ({ score, onRestart, onMai
         // Scores are in entry.key
         const maxScore = fetchedRows.reduce((max: number, entry: ScoreEntry) => entry.key > max ? entry.key : max, 0);
         setHighScore(maxScore);
+        
+        // Get current leader
+        const currentLeader = fetchedRows[0]; // First entry is the highest score
+        const newLeaderInfo = {
+          name: currentLeader.value.name,
+          score: currentLeader.key
+        };
+        
+        // Check for leader change and send notification
+        if (checkForLeaderChange && previousLeader) {
+          const hasNewLeader = (
+            previousLeader.name !== newLeaderInfo.name || 
+            previousLeader.score !== newLeaderInfo.score
+          );
+          
+          if (hasNewLeader) {
+            console.log('New leader detected:', newLeaderInfo);
+            await notifyLeaderboardUpdate(newLeaderInfo.name, newLeaderInfo.score);
+          }
+        }
+        
+        setPreviousLeader(newLeaderInfo);
       } else {
         setHighScore(0); // No scores on the leaderboard
+        setPreviousLeader(null);
       }
+    } catch (error) {
+      console.error('Error fetching leaderboard:', error);
+      setLeaderboardError(error instanceof Error ? error.message : 'Unknown error occurred');
     } finally {
       setIsLoadingLeaderboard(false);
     }
