@@ -7,6 +7,8 @@ import SumDisplay from './components/SumDisplay';
 import { useState, useEffect } from 'react'; // Import useState and useEffect
 import StartScreen from './components/StartScreen'; // 추가
 import GameOverScreen from './components/GameOverScreen'; // 추가
+import leaderboardMonitor from './utils/leaderboardMonitor';
+import { getNotificationEnabled } from './utils/notifications';
 
 // Define INITIAL_TIME_LEFT constant
 const INITIAL_TIME_LEFT = 60;
@@ -41,6 +43,23 @@ function App() {
     // Clear interval on component unmount or when isPaused/timeLeft changes
     return () => clearInterval(interval);
   }, [gameState, isPaused, timeLeft]);
+
+  // useEffect for leaderboard monitoring
+  useEffect(() => {
+    // 알림 설정이 활성화된 경우에만 모니터링 시작
+    if (getNotificationEnabled()) {
+      console.log('리더보드 모니터링 시작');
+      leaderboardMonitor.startMonitoring();
+    }
+
+    // 컴포넌트 언마운트 시 모니터링 중단
+    return () => {
+      if (leaderboardMonitor.isActive()) {
+        console.log('리더보드 모니터링 중단');
+        leaderboardMonitor.stopMonitoring();
+      }
+    };
+  }, []); // 빈 의존성 배열로 한 번만 실행
 
   const handleStartGame = () => {
     setGameState('Playing');

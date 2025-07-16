@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './StartScreen.css';
+import NotificationSettings from './NotificationSettings';
 
 // Define the structure of a score entry from CouchDB view
 interface ScoreEntry {
@@ -102,6 +103,8 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStartGame }) => {
           </table>
         )}
       </div>
+      
+      <NotificationSettings />
     </div>
   );
 };

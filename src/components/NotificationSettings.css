@@ -1,0 +1,170 @@
+.notification-settings {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 16px;
+  margin: 16px 0;
+  max-width: 400px;
+}
+
+.notification-settings h3 {
+  margin: 0 0 12px 0;
+  color: #333;
+  font-size: 1.1em;
+}
+
+.permission-status {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+  font-size: 0.9em;
+}
+
+.status {
+  font-weight: bold;
+  padding: 2px 8px;
+  border-radius: 4px;
+  margin-left: 8px;
+}
+
+.permission-granted {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.permission-denied {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.permission-default {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.permission-request {
+  margin: 12px 0;
+}
+
+.permission-request p {
+  margin: 0 0 8px 0;
+  font-size: 0.9em;
+  color: #666;
+}
+
+.permission-button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 0.9em;
+  transition: background-color 0.2s;
+}
+
+.permission-button:hover:not(:disabled) {
+  background-color: #0056b3;
+}
+
+.permission-button:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+}
+
+.permission-denied-info {
+  margin: 12px 0;
+  padding: 12px;
+  background-color: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 4px;
+}
+
+.permission-denied-info p {
+  margin: 0 0 8px 0;
+  font-size: 0.9em;
+}
+
+.permission-denied-info small {
+  color: #666;
+  line-height: 1.4;
+}
+
+.notification-toggle {
+  margin: 12px 0;
+}
+
+.toggle-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+.toggle-checkbox {
+  display: none;
+}
+
+.toggle-slider {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  background-color: #ccc;
+  border-radius: 24px;
+  transition: background-color 0.2s;
+  margin-right: 12px;
+}
+
+.toggle-slider::before {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: white;
+  top: 2px;
+  left: 2px;
+  transition: transform 0.2s;
+}
+
+.toggle-checkbox:checked + .toggle-slider {
+  background-color: #007bff;
+}
+
+.toggle-checkbox:checked + .toggle-slider::before {
+  transform: translateX(20px);
+}
+
+.toggle-text {
+  font-size: 0.9em;
+  color: #333;
+}
+
+.notification-info {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #dee2e6;
+}
+
+.notification-info small {
+  color: #666;
+  line-height: 1.4;
+}
+
+/* 모바일 대응 */
+@media (max-width: 768px) {
+  .notification-settings {
+    margin: 12px 0;
+    padding: 12px;
+  }
+  
+  .notification-settings h3 {
+    font-size: 1em;
+  }
+  
+  .permission-request p,
+  .toggle-text,
+  .permission-status {
+    font-size: 0.85em;
+  }
+}
