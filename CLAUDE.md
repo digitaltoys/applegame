@@ -73,3 +73,6 @@ npm run mock:server
 ### Deployment
 - Docker 설정 포함 (Dockerfile, nginx/default.conf)
 - GitLab CI/CD 준비 (protected branch 설정)
+
+## Git Work Guidelines
+- 수정사항에 맞는 새로운 브랜치를 생성해서 push 작업 진행할 것
