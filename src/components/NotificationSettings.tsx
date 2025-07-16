@@ -108,6 +108,14 @@ const NotificationSettings: React.FC = () => {
         <small>
           💡 알림은 새로운 1등이 등장했을 때만 표시됩니다.
         </small>
+        <br />
+        <small style={{ marginTop: '8px', display: 'block' }}>
+          📱 실시간 모니터링으로 다른 플레이어의 기록 갱신을 즉시 알려드립니다.
+        </small>
+        <br />
+        <small style={{ marginTop: '8px', display: 'block' }}>
+          🔋 배터리 최적화된 효율적인 알림 시스템입니다.
+        </small>
       </div>
     </div>
   );

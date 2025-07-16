@@ -3,8 +3,9 @@
   border: 1px solid #dee2e6;
   border-radius: 8px;
   padding: 16px;
-  margin: 16px 0;
+  margin: 20px 0 40px; /* 하단 여백 늘리기 */
   max-width: 400px;
+  width: 80%; /* StartScreen과 일관성 */
 }
 
 .notification-settings h3 {
@@ -75,6 +76,7 @@
 .permission-denied-info {
   margin: 12px 0;
   padding: 12px;
+  color:#721c24;
   background-color: #fff3cd;
   border: 1px solid #ffeaa7;
   border-radius: 4px;
