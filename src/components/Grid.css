@@ -1,22 +1,23 @@
 .grid-container {
   display: grid;
-  grid-template-columns: repeat(10, 40px); /* Creates 10 columns, each 40px wide */
-  grid-template-rows: repeat(10, 40px);    /* Creates 10 rows, each 40px high */
-  border: 1px solid #ccc;
-  width: max-content; /* Or a fixed width like 400px + borders */
-  margin: 20px auto; /* Center the grid on the page */
+  grid-template-columns: repeat(10, 1fr); /* 균등 분할 */
+  grid-template-rows: repeat(10, 1fr);    /* 균등 분할 */
+  border: 2px solid #ccc;
+  width: min(85vw, 85vh); /* 화면의 85% 또는 높이의 85% 중 작은 값 */
+  height: min(85vw, 85vh); /* 정사각형 유지 */
+  margin: 10px auto; /* Center the grid on the page */
   touch-action: none; /* Prevent scrolling during touch interactions */
+  max-width: 500px; /* 데스크톱에서 최대 크기 제한 */
+  max-height: 500px;
 }
 
 .grid-cell {
-  width: 40px;
-  height: 40px;
   border: 1px solid #eee;
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  padding-bottom: 1px;
-  font-size: 1.2em;
+  padding-bottom: 0.2vmin; /* 뷰포트에 비례한 패딩 */
+  font-size: min(3.5vw, 3.5vh, 1.8rem); /* 동적 폰트 크기 */
   font-family: sans-serif;
   font-weight: bold;
   color: white;
@@ -26,6 +27,7 @@
   background-position: center;
   background-repeat: no-repeat;
   box-sizing: border-box; /* Ensures padding and border don't increase the cell size */
+  aspect-ratio: 1; /* 정사각형 비율 강제 */
 }
 
 /* 빈 셀 스타일 (사과가 제거된 후) */
@@ -36,9 +38,12 @@
 
 /* 추가될 스타일 */
 .selected-apple {
-  background-color: #a0e0ff; /* 밝은 파란색 배경 */
-  border: 1px solid #007bff; /* 파란색 테두리 */
-  /* 필요에 따라 다른 스타일 추가 가능 (예: box-shadow) */
+  background-color: rgba(160, 224, 255, 0.8); /* 반투명 파란색 배경 */
+  border: 2px solid #007bff; /* 더 굵은 파란색 테두리 */
+  box-shadow: 0 0 8px rgba(0, 123, 255, 0.6); /* 파란색 글로우 효과 */
+  transform: scale(1.05); /* 살짝 확대 */
+  z-index: 1; /* 다른 셀 위로 올리기 */
+  position: relative;
 }
 
 .sum-display {
@@ -47,55 +52,64 @@
   /*text-align: center; /* Center the text */
 }
 
-@media (max-width: 768px) {
+/* 모바일 세로 모드 최적화 */
+@media (max-width: 768px) and (orientation: portrait) {
   .grid-container {
-    grid-template-columns: repeat(10, 36px); /* Reduced cell size for 10 columns */
-    grid-template-rows: repeat(10, 36px);    /* Reduced cell size for 10 rows */
-    margin: 10px auto; /* Adjust margin for smaller screens */
-    /* Consider overflow-x: auto; if it might still be too wide for very small screens,
-       though ideally, it should fit. */
+    width: min(92vw, 70vh); /* 모바일에서 더 큰 비율 */
+    height: min(92vw, 70vh);
+    margin: 5px auto;
+    max-width: none; /* 모바일에서 최대 크기 제한 해제 */
+    max-height: none;
   }
 
   .grid-cell {
-    width: 30px;  /* Reduced cell width */
-    height: 30px; /* Reduced cell height */
-    font-size: 0.9em; /* Reduced font size in cells */
-    color: white; /* Keep white color for better visibility */
-    background-image: url('/icons/apple.png');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
+    font-size: min(4.5vw, 3vh, 2rem); /* 모바일에서 더 큰 폰트 */
+    padding-bottom: 0.3vmin;
   }
 
-  .grid-cell.empty {
-    background-image: none;
-    /* background-color: #f5f5f5; */
-  }
-
-  /* If .sum-display is part of the grid component and needs adjustment */
   .sum-display {
-    font-size: 0.9em; /* Example: adjust font size if needed */
+    font-size: 1rem;
   }
 }
 
-@media (max-width: 375px) { /* Further adjustments for very small screens */
+/* 모바일 가로 모드 최적화 */
+@media (max-width: 768px) and (orientation: landscape) {
   .grid-container {
-    grid-template-columns: repeat(10, 25px); /* Further reduced cell size */
-    grid-template-rows: repeat(10, 25px);    /* Further reduced cell size */
+    width: min(65vw, 85vh); /* 가로 모드에서 높이 기준 */
+    height: min(65vw, 85vh);
+    margin: 5px auto;
   }
 
   .grid-cell {
-    width: 25px;
-    height: 25px;
-    font-size: 0.8em;
-    background-image: url('/icons/apple.png');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
+    font-size: min(3vw, 4vh, 1.5rem);
+  }
+}
+
+/* 초소형 화면 (아이폰 SE 등) */
+@media (max-width: 375px) {
+  .grid-container {
+    width: min(95vw, 65vh);
+    height: min(95vw, 65vh);
+    margin: 2px auto;
+    border-width: 1px; /* 얇은 테두리 */
   }
 
-  .grid-cell.empty {
-    background-image: none;
-    /* background-color: #f5f5f5; */
+  .grid-cell {
+    font-size: min(5vw, 2.5vh, 1.2rem);
+    border-width: 0.5px; /* 얇은 셀 테두리 */
+  }
+}
+
+/* 대형 화면 최적화 */
+@media (min-width: 1200px) {
+  .grid-container {
+    width: min(60vw, 60vh);
+    height: min(60vw, 60vh);
+    max-width: 600px; /* 대형 화면에서 최대 크기 증가 */
+    max-height: 600px;
+  }
+
+  .grid-cell {
+    font-size: min(2.5vw, 2.5vh, 2.2rem);
   }
 }

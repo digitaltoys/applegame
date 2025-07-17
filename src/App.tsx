@@ -137,7 +137,7 @@ function App() {
             <div className="game-info">
               <ScoreBoard score={score} />
               <TimerBar timeLeft={timeLeft} />
-              <div className='comment'>합이 10이되게 모드세요</div>
+              <div className='comment'>합이 10이되게 모으세요</div>
               <SumDisplay sum={currentSum} />
             </div>
             <Grid setScore={setScore} setCurrentSum={setCurrentSum} key={gridKey} onGameWin={handleGameWin} isPaused={isPaused} /> {/* onGameWin 추가, isPaused prop 추가 */}
