@@ -55,8 +55,8 @@
 /* 모바일 세로 모드 최적화 */
 @media (max-width: 768px) and (orientation: portrait) {
   .grid-container {
-    width: min(92vw, 70vh); /* 모바일에서 더 큰 비율 */
-    height: min(92vw, 70vh);
+    width: min(95vw, 70vh); /* 모바일에서 더 큰 비율 */
+    height: min(95vw, 70vh);
     margin: 5px auto;
     max-width: none; /* 모바일에서 최대 크기 제한 해제 */
     max-height: none;
