@@ -22,14 +22,14 @@
 }
 
 .start-screen > .start-button {
-  margin-bottom: 40px; /* 버튼 하단 여백 */
+  margin-bottom: 10px; /* 버튼 하단 여백 */
 }
 
 .start-button {
   padding: 10px 20px;
   font-size: 1.5rem;
   cursor: pointer;
-  margin-top: 20px;
+  margin-top: 5px;
   color: white;
   background-color: blue;
 }
@@ -65,7 +65,7 @@
   }
 
   .start-screen > .start-button {
-    margin-bottom: 20px; /* 모바일에서 버튼 하단 여백 줄이기 */
+    margin-bottom: 5px; /* 모바일에서 버튼 하단 여백 줄이기 */
   }
 
   .start-button {
@@ -81,7 +81,7 @@
 
 /* Styles for the inline leaderboard */
 .leaderboard-container-inline {
-  margin-top: 30px;
+  margin-top: 20px;
   margin-bottom: 20px; /* 하단 여백 추가 */
   width: 80%;
   max-width: 600px;
