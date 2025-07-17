@@ -217,8 +217,8 @@ const GameOverScreen: React.FC<GameOverScreenProps> = ({ score, onRestart, onMai
     <div className="game-over-screen">
       <h1>Game Over</h1>
       <div className="score-summary">
-        <p>High Score: {highScore}</p>
-        <p>Your Score: {score}</p>
+        <p className='high-score'>High Score: {highScore}</p>
+        <p className='your-score'>Your Score: {score}</p>
       </div>
 
       <div className="save-score-container">
