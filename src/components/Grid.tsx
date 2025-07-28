@@ -193,8 +193,8 @@ const Grid: React.FC<GridProps> = ({
       let newComboCount = comboCount;
       let bonusScore = 0;
 
-      // 콤보 체크: 3초 이내에 연속으로 제거했는지 확인
-      if (lastRemoveTime > 0 && (currentTime - lastRemoveTime) <= COMBO_TIME_WINDOW) {
+      // 콤보 체크: 콤보가 0이 아니고 3초 이내에 연속으로 제거했는지 확인
+      if (comboCount > 0 && lastRemoveTime > 0 && (currentTime - lastRemoveTime) <= COMBO_TIME_WINDOW) {
         newComboCount = comboCount + 1;
         bonusScore = calculateComboBonus(newComboCount);
         setComboCount(newComboCount);
@@ -204,7 +204,7 @@ const Grid: React.FC<GridProps> = ({
           console.log(`콤보 ${newComboCount} (보너스 없음)`);
         }
       } else {
-        // 3초가 지났으면 콤보 리셋
+        // 콤보가 끝났거나 3초가 지났으면 콤보 리셋
         newComboCount = 1;
         setComboCount(1);
         console.log('새로운 콤보 시작!');
@@ -315,8 +315,8 @@ const Grid: React.FC<GridProps> = ({
       let newComboCount = comboCount;
       let bonusScore = 0;
 
-      // 콤보 체크: 3초 이내에 연속으로 제거했는지 확인
-      if (lastRemoveTime > 0 && (currentTime - lastRemoveTime) <= COMBO_TIME_WINDOW) {
+      // 콤보 체크: 콤보가 0이 아니고 3초 이내에 연속으로 제거했는지 확인
+      if (comboCount > 0 && lastRemoveTime > 0 && (currentTime - lastRemoveTime) <= COMBO_TIME_WINDOW) {
         newComboCount = comboCount + 1;
         bonusScore = calculateComboBonus(newComboCount);
         setComboCount(newComboCount);
@@ -326,7 +326,7 @@ const Grid: React.FC<GridProps> = ({
           console.log(`콤보 ${newComboCount} (보너스 없음)`);
         }
       } else {
-        // 3초가 지났으면 콤보 리셋
+        // 콤보가 끝났거나 3초가 지났으면 콤보 리셋
         newComboCount = 1;
         setComboCount(1);
         console.log('새로운 콤보 시작!');
