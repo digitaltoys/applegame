@@ -1,0 +1,183 @@
+.combo-display {
+  position: relative;
+  text-align: center;
+  pointer-events: none;
+  transition: all 0.3s ease;
+  margin: 10px 0;
+  z-index: 100;
+  height: 4.3rem;
+}
+
+.combo-text {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #ff6b35;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  margin-bottom: 0.5rem;
+  animation: comboGlow 0.5s ease-in-out;
+}
+
+.combo-bonus {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #ffd700;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  animation: comboBounce 0.6s ease-in-out;
+}
+
+.combo-placeholder {
+  height: 5.1rem; /* combo-text + combo-bonus + timer의 높이와 동일하게 설정 */
+  visibility: hidden; /* 공간은 차지하지만 보이지 않음 */
+}
+
+.combo-timer {
+  margin-top: 8px;
+  width: 100%;
+  max-width: 200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.combo-timer-bar {
+  width: 100%;
+  height: 8px;
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.combo-timer-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ff6b35, #ffd700);
+  border-radius: 4px;
+  transition: width 0.1s linear;
+  box-shadow: 0 0 8px rgba(255, 107, 53, 0.6);
+}
+
+.combo-active .combo-text {
+  animation: comboGlow 0.5s ease-in-out, comboScale 0.3s ease-in-out;
+}
+
+.combo-active .combo-bonus {
+  animation: comboBounce 0.6s ease-in-out, comboScale 0.3s ease-in-out 0.1s;
+}
+
+.combo-level-up {
+  animation: comboLevelUp 0.8s ease-out;
+}
+
+.combo-sparkle {
+  animation: comboSparkle 1.2s ease-in-out;
+}
+
+@keyframes comboGlow {
+  0% {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    transform: scale(1);
+  }
+  50% {
+    text-shadow: 2px 2px 8px rgba(255, 107, 53, 0.8), 0 0 20px rgba(255, 107, 53, 0.6);
+    transform: scale(1.1);
+  }
+  100% {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    transform: scale(1);
+  }
+}
+
+@keyframes comboBounce {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  50% {
+    transform: translateY(-10px);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes comboScale {
+  0% {
+    transform: scale(0.8);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes comboLevelUp {
+  0% {
+    transform: scale(0.5) rotate(-10deg);
+    opacity: 0;
+    text-shadow: 0 0 30px rgba(255, 107, 53, 1);
+  }
+  30% {
+    transform: scale(1.3) rotate(5deg);
+    opacity: 1;
+    text-shadow: 0 0 20px rgba(255, 107, 53, 0.8), 2px 2px 4px rgba(0, 0, 0, 0.5);
+  }
+  60% {
+    transform: scale(0.9) rotate(-2deg);
+    text-shadow: 0 0 15px rgba(255, 107, 53, 0.6), 2px 2px 4px rgba(0, 0, 0, 0.5);
+  }
+  80% {
+    transform: scale(1.05) rotate(1deg);
+    text-shadow: 0 0 10px rgba(255, 107, 53, 0.4), 2px 2px 4px rgba(0, 0, 0, 0.5);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  }
+}
+
+@keyframes comboSparkle {
+  0%, 100% {
+    filter: drop-shadow(0 0 2px rgba(255, 215, 0, 0.7));
+  }
+  25% {
+    filter: drop-shadow(0 0 8px rgba(255, 215, 0, 1)) drop-shadow(0 0 12px rgba(255, 107, 53, 0.8));
+  }
+  50% {
+    filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.9)) drop-shadow(0 0 8px rgba(255, 107, 53, 0.6));
+  }
+  75% {
+    filter: drop-shadow(0 0 6px rgba(255, 215, 0, 1)) drop-shadow(0 0 10px rgba(255, 107, 53, 0.7));
+  }
+}
+
+/* 모바일 대응 */
+@media (max-width: 768px) {
+  .combo-display {
+    margin: 5px 0;
+  }
+  
+  .combo-text {
+    font-size: 1.5rem;
+  }
+  
+  .combo-bonus {
+    font-size: 1rem;
+  }
+  
+  .combo-placeholder {
+    height: 4.8rem; /* 모바일에서 줄어든 폰트 크기 + 타이머 바에 맞춰 조정 */
+  }
+  
+  .combo-timer {
+    margin-top: 6px;
+    max-width: 150px;
+  }
+  
+  .combo-timer-bar {
+    height: 6px;
+  }
+}

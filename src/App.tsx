@@ -4,6 +4,7 @@ import ScoreBoard from './components/ScoreBoard';
 import TimerBar from './components/TimerBar';
 import Controls from './components/Controls';
 import SumDisplay from './components/SumDisplay';
+import ComboDisplay from './components/ComboDisplay';
 import { useState, useEffect } from 'react'; // Import useState and useEffect
 import StartScreen from './components/StartScreen'; // 추가
 import GameOverScreen from './components/GameOverScreen'; // 추가
@@ -24,6 +25,8 @@ function App() {
   const [currentSum, setCurrentSum] = useState(0);
   const [gameState, setGameState] = useState<GameState>('StartScreen');
   const [gridKey, setGridKey] = useState(0); // Grid 리셋을 위한 key
+  const [comboCount, setComboCount] = useState(0); // 콤보 카운트
+  const [lastRemoveTime, setLastRemoveTime] = useState<number>(0); // 마지막 제거 시간 (ms)
 
   // useEffect for timer logic
   useEffect(() => {
@@ -67,6 +70,8 @@ function App() {
     setTimeLeft(INITIAL_TIME_LEFT);
     setIsPaused(false);
     setCurrentSum(0); // currentSum도 초기화
+    setComboCount(0); // 콤보 카운트 초기화
+    setLastRemoveTime(0); // 마지막 제거 시간 초기화
     setGridKey(prevKey => prevKey + 1); // Grid 컴포넌트 리셋
     console.log("Game started"); // Grid 초기화 로직은 Grid 컴포넌트 내부 또는 App에서 호출 필요
   };
@@ -99,6 +104,8 @@ function App() {
     setTimeLeft(INITIAL_TIME_LEFT); // Reset timeLeft to INITIAL_TIME_LEFT
     setCurrentSum(0);
     setIsPaused(false); // 일시정지 상태 해제
+    setComboCount(0); // 콤보 카운트 초기화
+    setLastRemoveTime(0); // 마지막 제거 시간 초기화
 
     // Grid 컴포넌트 리셋을 위한 key 변경
     // setGridKey 호출 전에 다른 상태들이 먼저 업데이트되도록 함
@@ -115,6 +122,8 @@ function App() {
     setScore(0); // 점수 초기화
     setTimeLeft(INITIAL_TIME_LEFT); // 남은 시간 초기화
     setCurrentSum(0); // 현재 합계 초기화
+    setComboCount(0); // 콤보 카운트 초기화
+    setLastRemoveTime(0); // 마지막 제거 시간 초기화
   };
 
   const handlePauseToggle = () => {
@@ -137,10 +146,21 @@ function App() {
             <div className="game-info">
               <ScoreBoard score={score} />
               <TimerBar timeLeft={timeLeft} />
-              <div className='comment'>합이 10이되게 모으세요</div>
+              <div className='comment'>10을 모으세요</div>
               <SumDisplay sum={currentSum} />
             </div>
-            <Grid setScore={setScore} setCurrentSum={setCurrentSum} key={gridKey} onGameWin={handleGameWin} isPaused={isPaused} /> {/* onGameWin 추가, isPaused prop 추가 */}
+            <ComboDisplay comboCount={comboCount} lastRemoveTime={lastRemoveTime} />
+            <Grid 
+              setScore={setScore} 
+              setCurrentSum={setCurrentSum} 
+              key={gridKey} 
+              onGameWin={handleGameWin} 
+              isPaused={isPaused}
+              comboCount={comboCount}
+              setComboCount={setComboCount}
+              lastRemoveTime={lastRemoveTime}
+              setLastRemoveTime={setLastRemoveTime}
+            /> {/* 콤보 상태 props 추가 */}
           </main>
           <footer className="app-controls">
             <Controls

@@ -11,7 +11,7 @@ const Controls: React.FC<ControlsProps> = ({ onRestart }) => {
   return (
     <div className="controls">
       <button onClick={onRestart}>Restart</button>
-      {/* <button onClick={onPauseToggle}>{isPaused ? 'Resume' : 'Pause'}</button> */}
+      <button onClick={onPauseToggle}>{isPaused ? 'Resume' : 'Pause'}</button>
     </div>
   );
 };
