@@ -61,6 +61,8 @@ const NotificationSettings: React.FC = () => {
         <span className={`status ${permissionStatus.className}`}>
           {permissionStatus.text}
         </span>
+        <button
+          onClick={handleRequestPermission}>설정</button>
       </div>
 
       {permission === 'default' && (
