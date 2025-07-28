@@ -7,7 +7,7 @@ interface ControlsProps {
   isPaused: boolean;
 }
 
-const Controls: React.FC<ControlsProps> = ({ onRestart, onPauseToggle, isPaused }) => {
+const Controls: React.FC<ControlsProps> = ({ onRestart }) => {
   return (
     <div className="controls">
       <button onClick={onRestart}>Restart</button>
