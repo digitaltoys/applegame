@@ -61,13 +61,13 @@ h1 {
 }
 
 .comment {
-  padding: 10px;
+  padding: 5px;
   border: 1px solid #ddd;
   border-radius: 4px;
   background-color: #f9f9f9;
   margin: 0;
-  font-size: 0.9em;
-  color: #333;
+  font-size: 0.7em;
+  color: #666;
 }
 
 @media (max-width: 768px) {

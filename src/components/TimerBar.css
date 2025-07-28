@@ -7,8 +7,9 @@
 }
 .timer-bar p {
   margin: 0;
-  font-size: 1em;
+  font-size: 1.8em;
   color: #c0392b; /* Reddish color for time */
+  font-weight: bold;
 }
 
 @media (max-width: 768px) {
@@ -21,6 +22,6 @@
   }
 
   .timer-bar p {
-    font-size: 0.85em; /* Further reduce font size */
+    font-size: 1.3em;
   }
 }

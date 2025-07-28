@@ -7,8 +7,9 @@
 }
 .score-board h2 {
   margin: 0;
-  font-size: 1.2em;
+  font-size: 2em;
   color: #333;
+  font-weight: bold;
 }
 
 @media (max-width: 768px) {
@@ -21,6 +22,6 @@
   }
 
   .score-board h2 {
-    font-size: 1em; /* Further reduce font size */
+    font-size: 1.5em;
   }
 }

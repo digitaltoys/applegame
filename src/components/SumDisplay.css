@@ -8,8 +8,8 @@
 }
 .sum-display p {
   margin: 0;
-  font-size: 1.1em;
-  font-weight: bold;
+  font-size: 0.9em;
+  font-weight: normal;
   color: #27ae60; /* Green color for sum */
 }
 
@@ -23,6 +23,6 @@
   }
 
   .sum-display p {
-    font-size: 1.5em; /* Further reduce font size */
+    font-size: 0.8em;
   }
 }

@@ -6,6 +6,10 @@ interface GridProps {
   setCurrentSum: React.Dispatch<React.SetStateAction<number>>;
   onGameWin: () => void;
   isPaused: boolean; // isPaused prop 추가
+  comboCount: number; // 콤보 카운트
+  setComboCount: React.Dispatch<React.SetStateAction<number>>;
+  lastRemoveTime: number; // 마지막 제거 시간 (ms)
+  setLastRemoveTime: React.Dispatch<React.SetStateAction<number>>;
 }
 
 // 셀의 좌표를 나타내는 인터페이스
@@ -20,6 +24,12 @@ interface SelectedApple extends CellPosition {
 }
 
 const GRID_SIZE = 10;
+const COMBO_TIME_WINDOW = 3000; // 3초
+
+// 콤보 보너스 점수 계산 함수
+const calculateComboBonus = (comboCount: number): number => {
+  return comboCount > 1 ? comboCount - 1 : 0; // 2회차부터 보너스: 2회차: +1점, 3회차: +2점...
+};
 
 const generateRandomNumber = () => {
   // 가중치 설정: 낮은 숫자가 더 자주 나오도록 조정
@@ -83,7 +93,16 @@ const getCellCoordsFromEvent = (event: React.MouseEvent<HTMLDivElement> | React.
 };
 
 
-const Grid: React.FC<GridProps> = ({ setScore, setCurrentSum, onGameWin, isPaused }) => {
+const Grid: React.FC<GridProps> = ({ 
+  setScore, 
+  setCurrentSum, 
+  onGameWin, 
+  isPaused, 
+  comboCount, 
+  setComboCount, 
+  lastRemoveTime, 
+  setLastRemoveTime 
+}) => {
   const [gridData, setGridData] = useState<(number | string)[][]>([]);
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [dragStartCell, setDragStartCell] = useState<CellPosition | null>(null);
@@ -170,16 +189,40 @@ const Grid: React.FC<GridProps> = ({ setScore, setCurrentSum, onGameWin, isPause
     // setCurrentSum(sum); // App.tsx의 setCurrentSum으로 업데이트는 handleMouseMove에서 이미 처리됨
 
     if (sum === 10) {
-      setScore(prevScore => prevScore + selectedApples.length);
+      const currentTime = Date.now();
+      let newComboCount = comboCount;
+      let bonusScore = 0;
+
+      // 콤보 체크: 3초 이내에 연속으로 제거했는지 확인
+      if (lastRemoveTime > 0 && (currentTime - lastRemoveTime) <= COMBO_TIME_WINDOW) {
+        newComboCount = comboCount + 1;
+        bonusScore = calculateComboBonus(newComboCount);
+        setComboCount(newComboCount);
+        if (bonusScore > 0) {
+          console.log(`콤보 ${newComboCount}! 보너스 점수: +${bonusScore}`);
+        } else {
+          console.log(`콤보 ${newComboCount} (보너스 없음)`);
+        }
+      } else {
+        // 3초가 지났으면 콤보 리셋
+        newComboCount = 1;
+        setComboCount(1);
+        console.log('새로운 콤보 시작!');
+      }
+
+      // 마지막 제거 시간 업데이트
+      setLastRemoveTime(currentTime);
+
+      // 기본 점수 + 콤보 보너스 점수
+      const totalScore = selectedApples.length + bonusScore;
+      setScore(prevScore => prevScore + totalScore);
 
       const newGridData = gridData.map(row => [...row]); // Deep copy
       selectedApples.forEach(apple => {
         newGridData[apple.row][apple.col] = ''; // Remove apples
       });
       setGridData(newGridData);
-      // setCurrentSum(0); // Reset sum display in App.tsx
       setSelectedApples([]);
-      //onSumChange(0); // Reset sum display in App.tsx
 
       // Check for game win condition (all apples cleared)
       const remainingApples = newGridData.flat().some(cell => cell !== '' && cell !== 0);
@@ -188,10 +231,9 @@ const Grid: React.FC<GridProps> = ({ setScore, setCurrentSum, onGameWin, isPause
       }
 
     } else {
-      // If sum is not 10, just clear selection and reset sum display
+      // If sum is not 10, just clear selection and reset combo
       setSelectedApples([]);
-      // setCurrentSum(0); // Reset sum display in App.tsx
-      //onSumChange(0); // Reset sum display in App.tsx
+      setComboCount(0); // 실패 시 콤보 리셋
     }
 
     setDragStartCell(null);
@@ -269,7 +311,33 @@ const Grid: React.FC<GridProps> = ({ setScore, setCurrentSum, onGameWin, isPause
     const sum = selectedApples.reduce((acc, apple) => acc + apple.value, 0);
 
     if (sum === 10) {
-      setScore(prevScore => prevScore + selectedApples.length);
+      const currentTime = Date.now();
+      let newComboCount = comboCount;
+      let bonusScore = 0;
+
+      // 콤보 체크: 3초 이내에 연속으로 제거했는지 확인
+      if (lastRemoveTime > 0 && (currentTime - lastRemoveTime) <= COMBO_TIME_WINDOW) {
+        newComboCount = comboCount + 1;
+        bonusScore = calculateComboBonus(newComboCount);
+        setComboCount(newComboCount);
+        if (bonusScore > 0) {
+          console.log(`콤보 ${newComboCount}! 보너스 점수: +${bonusScore}`);
+        } else {
+          console.log(`콤보 ${newComboCount} (보너스 없음)`);
+        }
+      } else {
+        // 3초가 지났으면 콤보 리셋
+        newComboCount = 1;
+        setComboCount(1);
+        console.log('새로운 콤보 시작!');
+      }
+
+      // 마지막 제거 시간 업데이트
+      setLastRemoveTime(currentTime);
+
+      // 기본 점수 + 콤보 보너스 점수
+      const totalScore = selectedApples.length + bonusScore;
+      setScore(prevScore => prevScore + totalScore);
       
       const newGridData = gridData.map(row => [...row]); // Deep copy
       selectedApples.forEach(apple => {
@@ -284,8 +352,9 @@ const Grid: React.FC<GridProps> = ({ setScore, setCurrentSum, onGameWin, isPause
         onGameWin(); // Notify App.tsx that the game is won
       }
     } else {
-      // If sum is not 10, just clear selection
+      // If sum is not 10, just clear selection and reset combo
       setSelectedApples([]);
+      setComboCount(0); // 실패 시 콤보 리셋
     }
     setDragStartCell(null);
     setDragCurrentCell(null);

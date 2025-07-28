@@ -8,7 +8,7 @@ interface TimerBarProps {
 const TimerBar: React.FC<TimerBarProps> = ({ timeLeft }) => {
   return (
     <div className="timer-bar">
-      <p>Time Left: {timeLeft}s</p>
+      <p>Time : {timeLeft}s</p>
     </div>
   );
 };
