@@ -47,6 +47,23 @@ function App() {
     return () => clearInterval(interval);
   }, [gameState, isPaused, timeLeft]);
 
+  // useEffect for combo timeout check
+  useEffect(() => {
+    const COMBO_TIME_WINDOW = 3000; // 3초
+    
+    const comboTimeoutCheck = setInterval(() => {
+      if (gameState === 'Playing' && !isPaused && comboCount > 1 && lastRemoveTime > 0) {
+        const timeSinceLastRemove = Date.now() - lastRemoveTime;
+        if (timeSinceLastRemove > COMBO_TIME_WINDOW) {
+          setComboCount(0); // 콤보 카운트 초기화
+          setLastRemoveTime(0); // 마지막 제거 시간 초기화
+        }
+      }
+    }, 100); // 100ms마다 체크
+
+    return () => clearInterval(comboTimeoutCheck);
+  }, [gameState, isPaused, comboCount, lastRemoveTime]);
+
   // useEffect for leaderboard monitoring
   useEffect(() => {
     // 알림 설정이 활성화된 경우에만 모니터링 시작
