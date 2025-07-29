@@ -2,7 +2,7 @@ import React from 'react';
 import './StartScreen.css';
 import NotificationSettings from './NotificationSettings';
 import Leaderboard from './Leaderboard';
-import { type GameRule, GAME_RULES } from '../App';
+import { type GameRule, GAME_RULES } from '../types/gameRules';
 
 interface StartScreenProps {
   onStartGame: () => void;

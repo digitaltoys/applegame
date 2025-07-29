@@ -11,6 +11,14 @@ interface ScoreDocument {
   createdAt: string;
 }
 
+interface LeaderboardEntry {
+  key: number;
+  value: {
+    name: string;
+    createdAt?: string;
+  };
+}
+
 interface ChangeEvent {
   seq: number;
   id: string;
@@ -58,7 +66,7 @@ class LeaderboardMonitor {
   }
 
   // 리더보드 데이터 가져오기
-  private async fetchLeaderboard(): Promise<unknown[]> {
+  private async fetchLeaderboard(): Promise<LeaderboardEntry[]> {
     const url = `${this.couchDbUrl}/_design/scores/_view/by_score?descending=true&limit=10`;
     const response = await fetch(url, {
       headers: {

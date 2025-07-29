@@ -3,7 +3,7 @@ import './GameOverScreen.css'; // CSS 파일도 생성 예정
 import { notifyLeaderboardUpdate } from '../utils/notifications';
 import { getCurrentChannel } from '../utils/channel';
 import Leaderboard, { type LeaderboardRef } from './Leaderboard';
-import { type GameRule, GAME_RULES } from '../App';
+import { type GameRule, GAME_RULES } from '../types/gameRules';
 
 
 interface GameOverScreenProps {

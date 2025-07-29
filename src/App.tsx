@@ -11,45 +11,12 @@ import GameOverScreen from './components/GameOverScreen'; // 추가
 import leaderboardMonitor from './utils/leaderboardMonitor';
 import { getNotificationEnabled } from './utils/notifications';
 import { initializeChannel } from './utils/channel';
+import { type GameRule, GAME_RULES } from './types/gameRules';
 
 // Define INITIAL_TIME_LEFT constant
 const INITIAL_TIME_LEFT = 60;
 
 type GameState = 'StartScreen' | 'Playing' | 'GameOver';
-
-// 게임 룰 타입 정의
-export type GameRule = 'classic' | 'speed' | 'challenge';
-
-// 룰별 설정
-export const GAME_RULES = {
-  classic: {
-    name: '클래식',
-    description: '기본 60초, 합이 10이 되는 조합을 찾아 제거',
-    timeLimit: 60,
-    targetSum: 10,
-    tag: 'classic',
-    enableCombo: false,
-    enableAppleBonus: false
-  },
-  speed: {
-    name: '스피드',
-    description: '60초 콤보 모드, 연속 제거로 보너스 점수 획득',
-    timeLimit: 60,
-    targetSum: 10,
-    tag: 'speed',
-    enableCombo: true,
-    enableAppleBonus: false
-  },
-  challenge: {
-    name: '챌린지',
-    description: '90초, 합이 15가 되는 조합을 찾아 제거 (4개 이상시 보너스)',
-    timeLimit: 90,
-    targetSum: 15,
-    tag: 'challenge',
-    enableCombo: false,
-    enableAppleBonus: true
-  }
-};
 
 function App() {
   // Basic state placeholders
@@ -149,6 +116,13 @@ function App() {
     // 추가적으로 게임 승리 상태를 저장하거나 다른 로직을 수행할 수 있습니다.
   };
 
+  const handlePauseToggle = useCallback(() => {
+    if (gameState !== 'Playing') return;
+    // Placeholder for pause/resume logic
+    // console.log("Toggling pause..."); // Removed
+    setIsPaused(!isPaused);
+  }, [gameState, isPaused]);
+
   // useEffect for keyboard controls (pause/resume)
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -192,13 +166,6 @@ function App() {
     setComboCount(0); // 콤보 카운트 초기화
     setLastRemoveTime(0); // 마지막 제거 시간 초기화
   };
-
-  const handlePauseToggle = useCallback(() => {
-    if (gameState !== 'Playing') return;
-    // Placeholder for pause/resume logic
-    // console.log("Toggling pause..."); // Removed
-    setIsPaused(!isPaused);
-  }, [gameState, isPaused]);
 
   return (
     <div className="app-container">
