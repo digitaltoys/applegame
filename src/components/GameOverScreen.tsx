@@ -75,13 +75,13 @@ const GameOverScreen: React.FC<GameOverScreenProps> = ({ score, selectedRule, on
     }
 
     const currentChannel = getCurrentChannel();
-    const newScoreEntry = { name: trimmedPlayerName, score: score, tag: [ "combo" ], channel: currentChannel };
     const ruleConfig = GAME_RULES[selectedRule];
     const newScoreEntry = { 
       name: trimmedPlayerName, 
       score: score, 
       tag: [ruleConfig.tag],
-      rule: selectedRule
+      rule: selectedRule,
+      channel: currentChannel
     };
     rankings.push(newScoreEntry);
 

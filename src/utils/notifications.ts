@@ -88,7 +88,7 @@ export const showServiceWorkerNotification = async (options: NotificationOptions
       ]
     };
     
-    await registration.showNotification(options.title, notificationOptions as any);
+    await registration.showNotification(options.title, notificationOptions as NotificationOptions);
   } catch (error) {
     console.error('Service Worker 알림 표시 실패:', error);
     showNotification(options); // 일반 알림으로 대체

@@ -58,7 +58,7 @@ class LeaderboardMonitor {
   }
 
   // 리더보드 데이터 가져오기
-  private async fetchLeaderboard(): Promise<any[]> {
+  private async fetchLeaderboard(): Promise<unknown[]> {
     const url = `${this.couchDbUrl}/_design/scores/_view/by_score?descending=true&limit=10`;
     const response = await fetch(url, {
       headers: {

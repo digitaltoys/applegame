@@ -4,16 +4,6 @@ import NotificationSettings from './NotificationSettings';
 import Leaderboard from './Leaderboard';
 import { type GameRule, GAME_RULES } from '../App';
 
-// Define the structure of a score entry from CouchDB view
-interface ScoreEntry {
-  id: string; // CouchDB-generated _id
-  key: number; // View key (score)
-  value: { // View value
-    name: string;
-    createdAt?: string;
-  };
-}
-
 interface StartScreenProps {
   onStartGame: () => void;
   selectedRule: GameRule;
@@ -21,54 +11,6 @@ interface StartScreenProps {
 }
 
 const StartScreen: React.FC<StartScreenProps> = ({ onStartGame, selectedRule, onRuleChange }) => {
-  const [leaderboardData, setLeaderboardData] = useState<ScoreEntry[]>([]);
-  const [leaderboardError, setLeaderboardError] = useState<string | null>(null);
-  const [isLoadingLeaderboard, setIsLoadingLeaderboard] = useState<boolean>(false);
-
-  const handleFetchLeaderboard = async () => {
-    setIsLoadingLeaderboard(true);
-    setLeaderboardError(null);
-    // Assuming the CouchDB view is set up at:
-    // http://couchdb.ioplug.net/scoredb/_design/scores/_view/by_score?descending=true&limit=10
-    const url = 'http://couchdb.ioplug.net/scoredb/_design/scores/_view/by_score?descending=true&limit=10';
-
-    try {
-      const response = await fetch(url, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Basic ${btoa('user1:any')}`, // Replace with actual credentials
-          }
-      });
-      if (!response.ok) {
-        const errorMsgText = await response.text(); // Get raw error text
-        let errorDetail = "";
-        try {
-            // Try to parse as JSON for structured CouchDB errors
-            const errorData = JSON.parse(errorMsgText);
-            errorDetail = ` - ${errorData.reason || errorData.error || errorMsgText}`;
-        } catch (e) {
-            // If not JSON, use the raw text (or part of it)
-            errorDetail = ` - ${errorMsgText.substring(0, 100)}`; // Limit length if it's HTML/long
-        }
-        throw new Error(`Failed to fetch leaderboard: ${response.status}${errorDetail}`);
-      }
-      const data = await response.json();
-      // The actual scores are in data.rows
-      setLeaderboardData(data.rows || []);
-    } catch (error) {
-      console.error("Error fetching leaderboard:", error);
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      setLeaderboardError(`Could not load leaderboard data. Please try again later. Error: ${errorMessage}`);
-      setLeaderboardData([]); // Clear data on error
-    } finally {
-      setIsLoadingLeaderboard(false);
-    }
-  };
-
-  useEffect(() => {
-    handleFetchLeaderboard();
-  }, []);
 
   return (
     <div className="start-screen">

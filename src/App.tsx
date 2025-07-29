@@ -5,7 +5,7 @@ import TimerBar from './components/TimerBar';
 import Controls from './components/Controls';
 import SumDisplay from './components/SumDisplay';
 import ComboDisplay from './components/ComboDisplay';
-import { useState, useEffect } from 'react'; // Import useState and useEffect
+import { useState, useEffect, useCallback } from 'react'; // Import useState, useEffect and useCallback
 import StartScreen from './components/StartScreen'; // 추가
 import GameOverScreen from './components/GameOverScreen'; // 추가
 import leaderboardMonitor from './utils/leaderboardMonitor';
@@ -33,8 +33,8 @@ export const GAME_RULES = {
   },
   speed: {
     name: '스피드',
-    description: '30초 단축 모드, 빠른 플레이 도전 (콤보 보너스)',
-    timeLimit: 30,
+    description: '60초 콤보 모드, 연속 제거로 보너스 점수 획득',
+    timeLimit: 60,
     targetSum: 10,
     tag: 'speed',
     enableCombo: true,
@@ -162,7 +162,7 @@ function App() {
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, []); // Empty dependency array means this effect runs once on mount and cleanup on unmount
+  }, [handlePauseToggle]); // Include handlePauseToggle in dependency array
 
   const handleRestart = () => {
     // 게임 상태 초기화
@@ -193,12 +193,12 @@ function App() {
     setLastRemoveTime(0); // 마지막 제거 시간 초기화
   };
 
-  const handlePauseToggle = () => {
+  const handlePauseToggle = useCallback(() => {
     if (gameState !== 'Playing') return;
     // Placeholder for pause/resume logic
     // console.log("Toggling pause..."); // Removed
     setIsPaused(!isPaused);
-  };
+  }, [gameState, isPaused]);
 
   return (
     <div className="app-container">
