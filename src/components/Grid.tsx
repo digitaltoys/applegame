@@ -10,6 +10,9 @@ interface GridProps {
   setComboCount: React.Dispatch<React.SetStateAction<number>>;
   lastRemoveTime: number; // 마지막 제거 시간 (ms)
   setLastRemoveTime: React.Dispatch<React.SetStateAction<number>>;
+  targetSum: number; // 목표 합계 (룰에 따라 변경)
+  enableCombo: boolean; // 콤보 활성화 여부
+  enableAppleBonus: boolean; // 사과 개수 보너스 활성화 여부
 }
 
 // 셀의 좌표를 나타내는 인터페이스
@@ -29,6 +32,11 @@ const COMBO_TIME_WINDOW = 3000; // 3초
 // 콤보 보너스 점수 계산 함수
 const calculateComboBonus = (comboCount: number): number => {
   return comboCount > 1 ? comboCount - 1 : 0; // 2회차부터 보너스: 2회차: +1점, 3회차: +2점...
+};
+
+// 사과 개수 보너스 점수 계산 함수 (3개 초과시 보너스)
+const calculateAppleBonus = (appleCount: number): number => {
+  return appleCount > 3 ? appleCount - 3 : 0; // 4개부터 보너스: 4개: +1점, 5개: +2점...
 };
 
 const generateRandomNumber = () => {
@@ -101,7 +109,10 @@ const Grid: React.FC<GridProps> = ({
   comboCount, 
   setComboCount, 
   lastRemoveTime, 
-  setLastRemoveTime 
+  setLastRemoveTime,
+  targetSum,
+  enableCombo,
+  enableAppleBonus
 }) => {
   const [gridData, setGridData] = useState<(number | string)[][]>([]);
   const [isDragging, setIsDragging] = useState<boolean>(false);
@@ -188,33 +199,43 @@ const Grid: React.FC<GridProps> = ({
     const sum = selectedApples.reduce((acc, apple) => acc + apple.value, 0);
     // setCurrentSum(sum); // App.tsx의 setCurrentSum으로 업데이트는 handleMouseMove에서 이미 처리됨
 
-    if (sum === 10) {
+    if (sum === targetSum) {
       const currentTime = Date.now();
       let newComboCount = comboCount;
       let bonusScore = 0;
 
-      // 콤보 체크: 콤보가 0이 아니고 3초 이내에 연속으로 제거했는지 확인
-      if (comboCount > 0 && lastRemoveTime > 0 && (currentTime - lastRemoveTime) <= COMBO_TIME_WINDOW) {
-        newComboCount = comboCount + 1;
-        bonusScore = calculateComboBonus(newComboCount);
-        setComboCount(newComboCount);
-        if (bonusScore > 0) {
-          console.log(`콤보 ${newComboCount}! 보너스 점수: +${bonusScore}`);
+      // 콤보 기능이 활성화된 경우에만 콤보 로직 실행
+      if (enableCombo) {
+        // 콤보 체크: 콤보가 0이 아니고 3초 이내에 연속으로 제거했는지 확인
+        if (comboCount > 0 && lastRemoveTime > 0 && (currentTime - lastRemoveTime) <= COMBO_TIME_WINDOW) {
+          newComboCount = comboCount + 1;
+          bonusScore = calculateComboBonus(newComboCount);
+          setComboCount(newComboCount);
+          if (bonusScore > 0) {
+            console.log(`콤보 ${newComboCount}! 보너스 점수: +${bonusScore}`);
+          } else {
+            console.log(`콤보 ${newComboCount} (보너스 없음)`);
+          }
         } else {
-          console.log(`콤보 ${newComboCount} (보너스 없음)`);
+          // 콤보가 끝났거나 3초가 지났으면 콤보 리셋
+          newComboCount = 1;
+          setComboCount(1);
+          console.log('새로운 콤보 시작!');
         }
-      } else {
-        // 콤보가 끝났거나 3초가 지났으면 콤보 리셋
-        newComboCount = 1;
-        setComboCount(1);
-        console.log('새로운 콤보 시작!');
+
+        // 마지막 제거 시간 업데이트
+        setLastRemoveTime(currentTime);
       }
 
-      // 마지막 제거 시간 업데이트
-      setLastRemoveTime(currentTime);
-
-      // 기본 점수 + 콤보 보너스 점수
-      const totalScore = selectedApples.length + bonusScore;
+      // 기본 점수 + 콤보 보너스 점수 + 사과 개수 보너스 점수
+      let appleBonusScore = 0;
+      if (enableAppleBonus) {
+        appleBonusScore = calculateAppleBonus(selectedApples.length);
+        if (appleBonusScore > 0) {
+          console.log(`사과 개수 보너스: ${selectedApples.length}개 → +${appleBonusScore}점`);
+        }
+      }
+      const totalScore = selectedApples.length + bonusScore + appleBonusScore;
       setScore(prevScore => prevScore + totalScore);
 
       const newGridData = gridData.map(row => [...row]); // Deep copy
@@ -236,7 +257,7 @@ const Grid: React.FC<GridProps> = ({
       
       // 콤보 시간이 남아있으면 콤보 유지, 시간이 지났으면 리셋
       const currentTime = Date.now();
-      if (comboCount > 0 && lastRemoveTime > 0 && (currentTime - lastRemoveTime) > COMBO_TIME_WINDOW) {
+      if (enableCombo && comboCount > 0 && lastRemoveTime > 0 && (currentTime - lastRemoveTime) > COMBO_TIME_WINDOW) {
         setComboCount(0); // 콤보 시간이 지났을 때만 리셋
       }
       // 콤보 시간이 남아있으면 콤보 카운트 유지
@@ -316,33 +337,43 @@ const Grid: React.FC<GridProps> = ({
 
     const sum = selectedApples.reduce((acc, apple) => acc + apple.value, 0);
 
-    if (sum === 10) {
+    if (sum === targetSum) {
       const currentTime = Date.now();
       let newComboCount = comboCount;
       let bonusScore = 0;
 
-      // 콤보 체크: 콤보가 0이 아니고 3초 이내에 연속으로 제거했는지 확인
-      if (comboCount > 0 && lastRemoveTime > 0 && (currentTime - lastRemoveTime) <= COMBO_TIME_WINDOW) {
-        newComboCount = comboCount + 1;
-        bonusScore = calculateComboBonus(newComboCount);
-        setComboCount(newComboCount);
-        if (bonusScore > 0) {
-          console.log(`콤보 ${newComboCount}! 보너스 점수: +${bonusScore}`);
+      // 콤보 기능이 활성화된 경우에만 콤보 로직 실행
+      if (enableCombo) {
+        // 콤보 체크: 콤보가 0이 아니고 3초 이내에 연속으로 제거했는지 확인
+        if (comboCount > 0 && lastRemoveTime > 0 && (currentTime - lastRemoveTime) <= COMBO_TIME_WINDOW) {
+          newComboCount = comboCount + 1;
+          bonusScore = calculateComboBonus(newComboCount);
+          setComboCount(newComboCount);
+          if (bonusScore > 0) {
+            console.log(`콤보 ${newComboCount}! 보너스 점수: +${bonusScore}`);
+          } else {
+            console.log(`콤보 ${newComboCount} (보너스 없음)`);
+          }
         } else {
-          console.log(`콤보 ${newComboCount} (보너스 없음)`);
+          // 콤보가 끝났거나 3초가 지났으면 콤보 리셋
+          newComboCount = 1;
+          setComboCount(1);
+          console.log('새로운 콤보 시작!');
         }
-      } else {
-        // 콤보가 끝났거나 3초가 지났으면 콤보 리셋
-        newComboCount = 1;
-        setComboCount(1);
-        console.log('새로운 콤보 시작!');
+
+        // 마지막 제거 시간 업데이트
+        setLastRemoveTime(currentTime);
       }
 
-      // 마지막 제거 시간 업데이트
-      setLastRemoveTime(currentTime);
-
-      // 기본 점수 + 콤보 보너스 점수
-      const totalScore = selectedApples.length + bonusScore;
+      // 기본 점수 + 콤보 보너스 점수 + 사과 개수 보너스 점수
+      let appleBonusScore = 0;
+      if (enableAppleBonus) {
+        appleBonusScore = calculateAppleBonus(selectedApples.length);
+        if (appleBonusScore > 0) {
+          console.log(`사과 개수 보너스: ${selectedApples.length}개 → +${appleBonusScore}점`);
+        }
+      }
+      const totalScore = selectedApples.length + bonusScore + appleBonusScore;
       setScore(prevScore => prevScore + totalScore);
       
       const newGridData = gridData.map(row => [...row]); // Deep copy
@@ -363,7 +394,7 @@ const Grid: React.FC<GridProps> = ({
       
       // 콤보 시간이 남아있으면 콤보 유지, 시간이 지났으면 리셋
       const currentTime = Date.now();
-      if (comboCount > 0 && lastRemoveTime > 0 && (currentTime - lastRemoveTime) > COMBO_TIME_WINDOW) {
+      if (enableCombo && comboCount > 0 && lastRemoveTime > 0 && (currentTime - lastRemoveTime) > COMBO_TIME_WINDOW) {
         setComboCount(0); // 콤보 시간이 지났을 때만 리셋
       }
       // 콤보 시간이 남아있으면 콤보 카운트 유지

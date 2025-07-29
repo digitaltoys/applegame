@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './GameOverScreen.css'; // CSS 파일도 생성 예정
 import { notifyLeaderboardUpdate } from '../utils/notifications';
+import { type GameRule, GAME_RULES } from '../App';
 
 // Copied from StartScreen.tsx
 interface ScoreEntry {
@@ -14,11 +15,12 @@ interface ScoreEntry {
 
 interface GameOverScreenProps {
   score: number;
+  selectedRule: GameRule;
   onRestart: () => void;
   onMainMenu: () => void;
 }
 
-const GameOverScreen: React.FC<GameOverScreenProps> = ({ score, onRestart, onMainMenu }) => {
+const GameOverScreen: React.FC<GameOverScreenProps> = ({ score, selectedRule, onRestart, onMainMenu }) => {
   const [highScore, setHighScore] = useState(0);
   const [playerName, setPlayerName] = useState('');
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
@@ -81,7 +83,13 @@ const GameOverScreen: React.FC<GameOverScreenProps> = ({ score, onRestart, onMai
       }
     }
 
-    const newScoreEntry = { name: trimmedPlayerName, score: score };
+    const ruleConfig = GAME_RULES[selectedRule];
+    const newScoreEntry = { 
+      name: trimmedPlayerName, 
+      score: score, 
+      tag: [ruleConfig.tag],
+      rule: selectedRule
+    };
     rankings.push(newScoreEntry);
 
     // Sort by score descending
@@ -102,6 +110,8 @@ const GameOverScreen: React.FC<GameOverScreenProps> = ({ score, onRestart, onMai
         name: trimmedPlayerName, // Use trimmed name for saving to DB
         score: score,
         createdAt: new Date().toISOString(),
+        tag: [ruleConfig.tag],
+        rule: selectedRule
       };
 
       // Using a separate try-catch for the fetch operation

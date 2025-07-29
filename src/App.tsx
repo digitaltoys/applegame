@@ -16,6 +16,40 @@ const INITIAL_TIME_LEFT = 60;
 
 type GameState = 'StartScreen' | 'Playing' | 'GameOver';
 
+// 게임 룰 타입 정의
+export type GameRule = 'classic' | 'speed' | 'challenge';
+
+// 룰별 설정
+export const GAME_RULES = {
+  classic: {
+    name: '클래식',
+    description: '기본 60초, 합이 10이 되는 조합을 찾아 제거',
+    timeLimit: 60,
+    targetSum: 10,
+    tag: 'classic',
+    enableCombo: false,
+    enableAppleBonus: false
+  },
+  speed: {
+    name: '스피드',
+    description: '30초 단축 모드, 빠른 플레이 도전 (콤보 보너스)',
+    timeLimit: 30,
+    targetSum: 10,
+    tag: 'speed',
+    enableCombo: true,
+    enableAppleBonus: false
+  },
+  challenge: {
+    name: '챌린지',
+    description: '90초, 합이 15가 되는 조합을 찾아 제거 (4개 이상시 보너스)',
+    timeLimit: 90,
+    targetSum: 15,
+    tag: 'challenge',
+    enableCombo: false,
+    enableAppleBonus: true
+  }
+};
+
 function App() {
   // Basic state placeholders
   const [score, setScore] = useState(0);
@@ -27,6 +61,16 @@ function App() {
   const [gridKey, setGridKey] = useState(0); // Grid 리셋을 위한 key
   const [comboCount, setComboCount] = useState(0); // 콤보 카운트
   const [lastRemoveTime, setLastRemoveTime] = useState<number>(0); // 마지막 제거 시간 (ms)
+  const [selectedRule, setSelectedRule] = useState<GameRule>(() => {
+    // 로컬 스토리지에서 저장된 룰 불러오기
+    const savedRule = localStorage.getItem('selectedGameRule') as GameRule;
+    return savedRule && savedRule in GAME_RULES ? savedRule : 'classic';
+  }); // 선택된 게임 룰
+
+  // 선택된 룰을 로컬 스토리지에 저장
+  useEffect(() => {
+    localStorage.setItem('selectedGameRule', selectedRule);
+  }, [selectedRule]);
 
   // useEffect for timer logic
   useEffect(() => {
@@ -82,15 +126,16 @@ function App() {
   }, []); // 빈 의존성 배열로 한 번만 실행
 
   const handleStartGame = () => {
+    const currentRuleConfig = GAME_RULES[selectedRule];
     setGameState('Playing');
     setScore(0);
-    setTimeLeft(INITIAL_TIME_LEFT);
+    setTimeLeft(currentRuleConfig.timeLimit); // 선택된 룰의 시간 제한 사용
     setIsPaused(false);
     setCurrentSum(0); // currentSum도 초기화
     setComboCount(0); // 콤보 카운트 초기화
     setLastRemoveTime(0); // 마지막 제거 시간 초기화
     setGridKey(prevKey => prevKey + 1); // Grid 컴포넌트 리셋
-    console.log("Game started"); // Grid 초기화 로직은 Grid 컴포넌트 내부 또는 App에서 호출 필요
+    console.log(`Game started with rule: ${currentRuleConfig.name}`);
   };
 
   const handleGameWin = () => {
@@ -117,8 +162,9 @@ function App() {
 
   const handleRestart = () => {
     // 게임 상태 초기화
+    const currentRuleConfig = GAME_RULES[selectedRule];
     setScore(0);
-    setTimeLeft(INITIAL_TIME_LEFT); // Reset timeLeft to INITIAL_TIME_LEFT
+    setTimeLeft(currentRuleConfig.timeLimit); // 선택된 룰의 시간 제한 사용
     setCurrentSum(0);
     setIsPaused(false); // 일시정지 상태 해제
     setComboCount(0); // 콤보 카운트 초기화
@@ -153,7 +199,11 @@ function App() {
   return (
     <div className="app-container">
       {gameState === 'StartScreen' ? (
-        <StartScreen onStartGame={handleStartGame} />
+        <StartScreen 
+          onStartGame={handleStartGame}
+          selectedRule={selectedRule}
+          onRuleChange={setSelectedRule}
+        />
       ) : gameState === 'Playing' ? (
         <>
           <header className="app-header">
@@ -163,10 +213,12 @@ function App() {
             <div className="game-info">
               <ScoreBoard score={score} />
               <TimerBar timeLeft={timeLeft} />
-              <div className='comment'>10을 모으세요</div>
+              <div className='comment'>{GAME_RULES[selectedRule].targetSum}을 모으세요</div>
               <SumDisplay sum={currentSum} />
             </div>
-            <ComboDisplay comboCount={comboCount} lastRemoveTime={lastRemoveTime} />
+            {GAME_RULES[selectedRule].enableCombo && (
+              <ComboDisplay comboCount={comboCount} lastRemoveTime={lastRemoveTime} />
+            )}
             <Grid 
               setScore={setScore} 
               setCurrentSum={setCurrentSum} 
@@ -177,6 +229,9 @@ function App() {
               setComboCount={setComboCount}
               lastRemoveTime={lastRemoveTime}
               setLastRemoveTime={setLastRemoveTime}
+              targetSum={GAME_RULES[selectedRule].targetSum}
+              enableCombo={GAME_RULES[selectedRule].enableCombo}
+              enableAppleBonus={GAME_RULES[selectedRule].enableAppleBonus}
             /> {/* 콤보 상태 props 추가 */}
           </main>
           <footer className="app-controls">
@@ -190,6 +245,7 @@ function App() {
       ) : ( // gameState === 'GameOver'
         <GameOverScreen
           score={score}
+          selectedRule={selectedRule}
           onRestart={handleRestart}
           onMainMenu={handleMainMenu}
         />

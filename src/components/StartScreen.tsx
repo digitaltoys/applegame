@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './StartScreen.css';
 import NotificationSettings from './NotificationSettings';
+import { type GameRule, GAME_RULES } from '../App';
 
 // Define the structure of a score entry from CouchDB view
 interface ScoreEntry {
@@ -14,9 +15,11 @@ interface ScoreEntry {
 
 interface StartScreenProps {
   onStartGame: () => void;
+  selectedRule: GameRule;
+  onRuleChange: (rule: GameRule) => void;
 }
 
-const StartScreen: React.FC<StartScreenProps> = ({ onStartGame }) => {
+const StartScreen: React.FC<StartScreenProps> = ({ onStartGame, selectedRule, onRuleChange }) => {
   const [leaderboardData, setLeaderboardData] = useState<ScoreEntry[]>([]);
   const [leaderboardError, setLeaderboardError] = useState<string | null>(null);
   const [isLoadingLeaderboard, setIsLoadingLeaderboard] = useState<boolean>(false);
@@ -69,8 +72,33 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStartGame }) => {
   return (
     <div className="start-screen">
       <h1>Apple Collector Game</h1>
+      
+      {/* 룰 선택 섹션 */}
+      <div className="rule-selection">
+        <h2>게임 룰 선택</h2>
+        <div className="rule-options">
+          {(Object.keys(GAME_RULES) as GameRule[]).map((ruleKey) => {
+            const rule = GAME_RULES[ruleKey];
+            return (
+              <div 
+                key={ruleKey}
+                className={`rule-option ${selectedRule === ruleKey ? 'selected' : ''}`}
+                onClick={() => onRuleChange(ruleKey)}
+              >
+                <h3>{rule.name}</h3>
+                <p>{rule.description}</p>
+                <div className="rule-details">
+                  <span>⏱️ {rule.timeLimit}초</span>
+                  <span>🎯 합계: {rule.targetSum}</span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+      
       <button onClick={onStartGame} className="start-button">
-        Start Game
+        {GAME_RULES[selectedRule].name} 시작
       </button>
 
       <div className="leaderboard-container-inline">
