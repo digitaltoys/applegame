@@ -10,6 +10,7 @@ import StartScreen from './components/StartScreen'; // 추가
 import GameOverScreen from './components/GameOverScreen'; // 추가
 import leaderboardMonitor from './utils/leaderboardMonitor';
 import { getNotificationEnabled } from './utils/notifications';
+import { initializeChannel } from './utils/channel';
 
 // Define INITIAL_TIME_LEFT constant
 const INITIAL_TIME_LEFT = 60;
@@ -64,8 +65,11 @@ function App() {
     return () => clearInterval(comboTimeoutCheck);
   }, [gameState, isPaused, comboCount, lastRemoveTime]);
 
-  // useEffect for leaderboard monitoring
+  // useEffect for initialization (channel and leaderboard monitoring)
   useEffect(() => {
+    // 채널 초기화
+    initializeChannel();
+    
     // 알림 설정이 활성화된 경우에만 모니터링 시작
     if (getNotificationEnabled()) {
       console.log('리더보드 모니터링 시작');

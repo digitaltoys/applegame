@@ -143,56 +143,9 @@
   box-sizing: border-box;
 }
 
-/* Styles for the inline leaderboard (copied from StartScreen.css) */
-.leaderboard-container-inline {
+/* GameOverScreen specific overrides for leaderboard */
+.game-over-screen .leaderboard-container-inline {
   margin-top: 30px;
-  width: 80%;
-  max-width: 600px; /* Same as StartScreen for consistency */
-  background-color: rgba(255, 255, 255, 0.1);
-  padding: 20px;
-  border-radius: 8px;
-}
-
-.leaderboard-container-inline h2 {
-  margin-bottom: 15px;
-  color: #fff;
-}
-
-.leaderboard-table-inline {
-  width: 100%;
-  border-collapse: collapse;
-  color: #ddd;
-}
-
-.leaderboard-table-inline th,
-.leaderboard-table-inline td {
-  border: 1px solid #555;
-  padding: 8px 12px;
-  text-align: left;
-}
-
-.leaderboard-table-inline th {
-  background-color: #333;
-  color: #fff;
-}
-
-.leaderboard-table-inline tbody tr:nth-child(odd) {
-  background-color: rgba(255, 255, 255, 0.05);
-}
-
-.leaderboard-table-inline tbody tr:hover {
-  background-color: rgba(255, 255, 255, 0.15);
-}
-
-.leaderboard-message {
-  margin-top: 10px;
-  font-size: 1.1rem;
-  color: #ccc;
-}
-
-.leaderboard-message.error {
-  color: #ff6b6b;
-  font-weight: bold;
 }
 
 
@@ -252,24 +205,21 @@
     font-size: 1.1rem;
   }
 
-  /* Responsive adjustments for the inline leaderboard (copied from StartScreen.css) */
-  .leaderboard-container-inline {
-    width: 90%; /* Match other containers on small screens */
-    padding: 15px;
-    margin-top: 20px; /* Adjust margin */
+  /* Responsive adjustments for GameOverScreen leaderboard */
+  .game-over-screen .leaderboard-container-inline {
+    margin-top: 20px;
   }
 
-  .leaderboard-table-inline th,
-  .leaderboard-table-inline td {
-    padding: 6px 8px;
-    font-size: 0.85rem; /* Slightly smaller for game over screen */
+  .game-over-screen .leaderboard-table-inline th,
+  .game-over-screen .leaderboard-table-inline td {
+    font-size: 0.85rem;
   }
 
-  .leaderboard-container-inline h2 {
-    font-size: 1.3rem; /* Slightly smaller */
+  .game-over-screen .leaderboard-container-inline h2 {
+    font-size: 1.3rem;
   }
 
-  .leaderboard-message {
-    font-size: 0.9rem; /* Match other messages */
+  .game-over-screen .leaderboard-message {
+    font-size: 0.9rem;
   }
 }

@@ -1,16 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import './GameOverScreen.css'; // CSS 파일도 생성 예정
 import { notifyLeaderboardUpdate } from '../utils/notifications';
+import { getCurrentChannel } from '../utils/channel';
+import Leaderboard, { type LeaderboardRef } from './Leaderboard';
 
-// Copied from StartScreen.tsx
-interface ScoreEntry {
-  id: string;
-  key: number;
-  value: {
-    name: string;
-    createdAt?: string;
-  };
-}
 
 interface GameOverScreenProps {
   score: number;
@@ -24,25 +17,23 @@ const GameOverScreen: React.FC<GameOverScreenProps> = ({ score, onRestart, onMai
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
   const [isScoreSaved, setIsScoreSaved] = useState<boolean>(false);
 
-  // Leaderboard states - Copied from StartScreen.tsx
-  const [leaderboardData, setLeaderboardData] = useState<ScoreEntry[]>([]);
-  const [leaderboardError, setLeaderboardError] = useState<string | null>(null);
-  const [isLoadingLeaderboard, setIsLoadingLeaderboard] = useState<boolean>(false);
-  
   // Track previous leaderboard leader for notification
   const [previousLeader, setPreviousLeader] = useState<{name: string, score: number} | null>(null);
+  
+  // Leaderboard ref to trigger refresh
+  const leaderboardRef = useRef<LeaderboardRef>(null);
 
-  // This useEffect is now only for updating the *local* personal best.
-  // The displayed highScore state is set by handleFetchLeaderboard.
+  // 로컬 최고점수 업데이트
   useEffect(() => {
     const localHighScoreString = localStorage.getItem('appleCollectorHighScore');
     const localHighScore = localHighScoreString ? parseInt(localHighScoreString, 10) : 0;
     if (score > localHighScore) {
       localStorage.setItem('appleCollectorHighScore', score.toString());
+      setHighScore(score);
+    } else {
+      setHighScore(localHighScore);
     }
-    // We no longer set the highScore state here based on the current game's score directly.
-    // It's updated via fetching leaderboard data.
-  }, [score]); // Only depends on score
+  }, [score]);
 
   // Load player name from localStorage on mount
   useEffect(() => {
@@ -81,7 +72,8 @@ const GameOverScreen: React.FC<GameOverScreenProps> = ({ score, onRestart, onMai
       }
     }
 
-    const newScoreEntry = { name: trimmedPlayerName, score: score };
+    const currentChannel = getCurrentChannel();
+    const newScoreEntry = { name: trimmedPlayerName, score: score, tag: [ "combo" ], channel: currentChannel };
     rankings.push(newScoreEntry);
 
     // Sort by score descending
@@ -102,6 +94,8 @@ const GameOverScreen: React.FC<GameOverScreenProps> = ({ score, onRestart, onMai
         name: trimmedPlayerName, // Use trimmed name for saving to DB
         score: score,
         createdAt: new Date().toISOString(),
+        tag: [ "combo" ],
+        channel: currentChannel
       };
 
       // Using a separate try-catch for the fetch operation
@@ -135,82 +129,32 @@ const GameOverScreen: React.FC<GameOverScreenProps> = ({ score, onRestart, onMai
       setSaveMessage('로컬 점수 저장 중 오류가 발생했습니다.');
       setIsScoreSaved(false);
     }
-    // After saving, fetch the leaderboard again to show the latest scores and check for leader change
-    handleFetchLeaderboard(true);
+    // Leaderboard를 새로고침하여 최신 점수 표시
+    leaderboardRef.current?.refresh();
   };
 
-  // handleFetchLeaderboard - Copied and adapted from StartScreen.tsx
-  const handleFetchLeaderboard = async (checkForLeaderChange: boolean = false) => {
-    setIsLoadingLeaderboard(true);
-    setLeaderboardError(null);
-    const url = 'http://couchdb.ioplug.net/scoredb/_design/scores/_view/by_score?descending=true&limit=10';
-
-    try {
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Basic ${btoa('user1:any')}`,
-        }
-      });
-      if (!response.ok) {
-        const errorMsgText = await response.text();
-        let errorDetail = "";
-        try {
-          const errorData = JSON.parse(errorMsgText);
-          errorDetail = ` - ${errorData.reason || errorData.error || errorMsgText}`;
-        } catch (e) {
-          errorDetail = ` - ${errorMsgText.substring(0, 100)}`;
-        }
-        throw new Error(`Failed to fetch leaderboard: ${response.status}${errorDetail}`);
+  // 리더보드에서 리더 정보를 받을 때 알림 처리
+  const handleLeaderFetched = async (leader: { name: string; score: number } | null) => {
+    if (leader && previousLeader) {
+      const hasNewLeader = (
+        previousLeader.name !== leader.name || 
+        previousLeader.score !== leader.score
+      );
+      
+      if (hasNewLeader) {
+        console.log('New leader detected:', leader);
+        await notifyLeaderboardUpdate(leader.name, leader.score);
       }
-      const data = await response.json();
-      const fetchedRows = data.rows || [];
-      setLeaderboardData(fetchedRows);
-
-      if (fetchedRows.length > 0) {
-        // Scores are in entry.key
-        const maxScore = fetchedRows.reduce((max: number, entry: ScoreEntry) => entry.key > max ? entry.key : max, 0);
-        setHighScore(maxScore);
-        
-        // Get current leader
-        const currentLeader = fetchedRows[0]; // First entry is the highest score
-        const newLeaderInfo = {
-          name: currentLeader.value.name,
-          score: currentLeader.key
-        };
-        
-        // Check for leader change and send notification
-        if (checkForLeaderChange && previousLeader) {
-          const hasNewLeader = (
-            previousLeader.name !== newLeaderInfo.name || 
-            previousLeader.score !== newLeaderInfo.score
-          );
-          
-          if (hasNewLeader) {
-            console.log('New leader detected:', newLeaderInfo);
-            await notifyLeaderboardUpdate(newLeaderInfo.name, newLeaderInfo.score);
-          }
-        }
-        
-        setPreviousLeader(newLeaderInfo);
-      } else {
-        setHighScore(0); // No scores on the leaderboard
-        setPreviousLeader(null);
-      }
-    } catch (error) {
-      console.error('Error fetching leaderboard:', error);
-      setLeaderboardError(error instanceof Error ? error.message : 'Unknown error occurred');
-    } finally {
-      setIsLoadingLeaderboard(false);
     }
-  }
-
-  // Fetch leaderboard when component mounts
-  useEffect(() => {
-    handleFetchLeaderboard();
-    // The dependency array is empty, so this runs once on mount.
-  }, []);
+    
+    if (leader) {
+      setPreviousLeader(leader);
+      // 온라인 최고점수가 로컬보다 높으면 업데이트
+      if (leader.score > highScore) {
+        setHighScore(leader.score);
+      }
+    }
+  };
 
 
   return (
@@ -250,37 +194,11 @@ const GameOverScreen: React.FC<GameOverScreenProps> = ({ score, onRestart, onMai
         )}
       </div>
 
-      {/* Leaderboard Section - Copied and adapted from StartScreen.tsx */}
-      <div className="leaderboard-container-inline">
-        <h2>Leaderboard</h2>
-        {isLoadingLeaderboard && <p className="leaderboard-message">Loading leaderboard...</p>}
-        {leaderboardError && <p className="leaderboard-message error">{leaderboardError}</p>}
-        {!isLoadingLeaderboard && !leaderboardError && leaderboardData.length === 0 && (
-          <p className="leaderboard-message">No scores yet...</p>
-        )}
-        {!isLoadingLeaderboard && !leaderboardError && leaderboardData.length > 0 && (
-          <table className="leaderboard-table-inline">
-            <thead>
-              <tr>
-                <th>Rank</th>
-                <th>Name</th>
-                <th>Score</th>
-                <th>Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              {leaderboardData.map((scoreEntry, index) => (
-                <tr key={scoreEntry.id || index}>
-                  <td>{index + 1}</td>
-                  <td>{scoreEntry.value.name}</td>
-                  <td>{scoreEntry.key}</td>
-                  <td>{scoreEntry.value.createdAt ? new Date(scoreEntry.value.createdAt).toLocaleDateString() : 'N/A'}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
+      <Leaderboard 
+        ref={leaderboardRef}
+        showAsModal={false}
+        onLeaderFetched={handleLeaderFetched}
+      />
 
       <div className="buttons">
         <button onClick={onRestart} className="restart-button">
