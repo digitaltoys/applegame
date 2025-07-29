@@ -83,3 +83,102 @@
 .start-screen .leaderboard-container-inline {
   margin-bottom: 20px; /* 하단 여백 추가 */
 }
+
+/* 룰 선택 스타일 */
+.rule-selection {
+  margin: 30px 0;
+  width: 90%;
+  max-width: 600px;
+}
+
+.rule-selection h2 {
+  color: #fff;
+  margin-bottom: 20px;
+  text-align: center;
+  font-size: 1.8rem;
+}
+
+.rule-options {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.rule-option {
+  border: 2px solid #555;
+  border-radius: 10px;
+  padding: 20px;
+  background-color: rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #ddd;
+}
+
+.rule-option:hover {
+  border-color: #4CAF50;
+  background-color: rgba(76, 175, 80, 0.1);
+}
+
+.rule-option.selected {
+  border-color: #4CAF50;
+  background-color: rgba(76, 175, 80, 0.2);
+  color: #fff;
+}
+
+.rule-option h3 {
+  margin: 0 0 10px 0;
+  color: #4CAF50;
+  font-size: 1.3rem;
+}
+
+.rule-option.selected h3 {
+  color: #66BB6A;
+}
+
+.rule-option p {
+  margin: 0 0 15px 0;
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.rule-details {
+  display: flex;
+  gap: 20px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  justify-content: center;
+  margin-top: 5px;
+}
+
+.rule-details span {
+  color: #81C784;
+}
+
+/* 룰 선택 반응형 디자인 */
+@media (max-width: 768px) {
+  .rule-selection {
+    width: 95%;
+  }
+  
+  .rule-selection h2 {
+    font-size: 1.5rem;
+  }
+  
+  .rule-option {
+    padding: 15px;
+  }
+  
+  .rule-option h3 {
+    font-size: 1.1rem;
+  }
+  
+  .rule-option p {
+    font-size: 0.9rem;
+  }
+  
+  .rule-details {
+    flex-direction: row;
+    gap: 15px;
+    justify-content: center;
+  }
+}
