@@ -231,9 +231,15 @@ const Grid: React.FC<GridProps> = ({
       }
 
     } else {
-      // If sum is not 10, just clear selection and reset combo
+      // If sum is not 10, just clear selection
       setSelectedApples([]);
-      setComboCount(0); // 실패 시 콤보 리셋
+      
+      // 콤보 시간이 남아있으면 콤보 유지, 시간이 지났으면 리셋
+      const currentTime = Date.now();
+      if (comboCount > 0 && lastRemoveTime > 0 && (currentTime - lastRemoveTime) > COMBO_TIME_WINDOW) {
+        setComboCount(0); // 콤보 시간이 지났을 때만 리셋
+      }
+      // 콤보 시간이 남아있으면 콤보 카운트 유지
     }
 
     setDragStartCell(null);
@@ -352,9 +358,15 @@ const Grid: React.FC<GridProps> = ({
         onGameWin(); // Notify App.tsx that the game is won
       }
     } else {
-      // If sum is not 10, just clear selection and reset combo
+      // If sum is not 10, just clear selection
       setSelectedApples([]);
-      setComboCount(0); // 실패 시 콤보 리셋
+      
+      // 콤보 시간이 남아있으면 콤보 유지, 시간이 지났으면 리셋
+      const currentTime = Date.now();
+      if (comboCount > 0 && lastRemoveTime > 0 && (currentTime - lastRemoveTime) > COMBO_TIME_WINDOW) {
+        setComboCount(0); // 콤보 시간이 지났을 때만 리셋
+      }
+      // 콤보 시간이 남아있으면 콤보 카운트 유지
     }
     setDragStartCell(null);
     setDragCurrentCell(null);
