@@ -170,6 +170,8 @@
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   width: 80%;
   max-width: 600px;
+  min-height: 300px; /* 최소 높이 설정으로 레이아웃 안정화 */
+  position: relative; /* 로딩 오버레이를 위한 position */
 }
 
 .leaderboard-container-inline h2 {
@@ -182,6 +184,8 @@
   border-collapse: collapse;
   margin-bottom: 20px;
   color: #ddd;
+  table-layout: fixed; /* 테이블 레이아웃 고정으로 깜빡임 방지 */
+  transition: opacity 0.2s ease-in-out; /* 부드러운 전환 효과 */
 }
 
 .leaderboard-table-inline th,
@@ -206,21 +210,26 @@
   background-color: rgba(255, 255, 255, 0.15);
 }
 
-.leaderboard-table-inline td.rank {
-  width: 30px;
+.leaderboard-table-inline td.rank,
+.leaderboard-table-inline th.rank {
+  width: 15%;
   text-align: center;
 }
 
-.leaderboard-table-inline td.score {
-  width: 70px;
+.leaderboard-table-inline td.score,
+.leaderboard-table-inline th.score {
+  width: 20%;
   text-align: right;
 }
 
 .leaderboard-table-inline td.channel {
-  width: 100px;
+  width: 25%;
   text-align: center;
   font-size: 0.9rem;
   color: #aaa;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .leaderboard-message {
@@ -229,6 +238,19 @@
   margin-top: 10px;
   font-size: 1.1rem;
   color: #ccc;
+  opacity: 1;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .leaderboard-message.error {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import './GameOverScreen.css'; // CSS 파일도 생성 예정
 import { notifyLeaderboardUpdate } from '../utils/notifications';
 import { getCurrentChannel } from '../utils/channel';
@@ -122,6 +122,8 @@ const GameOverScreen: React.FC<GameOverScreenProps> = ({ score, selectedRule, on
         if (response.ok) {
           setSaveMessage(`${trimmedPlayerName}님의 점수: ${score}점이 로컬 및 온라인 랭킹에 모두 저장되었습니다!`);
           setIsScoreSaved(true);
+          // 온라인 저장 성공 시에만 리더보드 새로고침
+          setTimeout(() => leaderboardRef.current?.refresh(), 500);
         } else {
           const errorData = await response.text();
           console.error('Failed to save score to CouchDB:', response.status, errorData);
@@ -139,12 +141,10 @@ const GameOverScreen: React.FC<GameOverScreenProps> = ({ score, selectedRule, on
       setSaveMessage('로컬 점수 저장 중 오류가 발생했습니다.');
       setIsScoreSaved(false);
     }
-    // Leaderboard를 새로고침하여 최신 점수 표시
-    leaderboardRef.current?.refresh();
   };
 
   // 리더보드에서 리더 정보를 받을 때 알림 처리
-  const handleLeaderFetched = async (leader: { name: string; score: number } | null) => {
+  const handleLeaderFetched = useCallback(async (leader: { name: string; score: number } | null) => {
     if (leader && previousLeader) {
       const hasNewLeader = (
         previousLeader.name !== leader.name || 
@@ -158,13 +158,18 @@ const GameOverScreen: React.FC<GameOverScreenProps> = ({ score, selectedRule, on
     }
     
     if (leader) {
-      setPreviousLeader(leader);
+      setPreviousLeader(prev => {
+        // 같은 리더 정보면 상태 업데이트 건너뛰기
+        if (prev && prev.name === leader.name && prev.score === leader.score) {
+          return prev;
+        }
+        return leader;
+      });
+      
       // 온라인 최고점수가 로컬보다 높으면 업데이트
-      if (leader.score > highScore) {
-        setHighScore(leader.score);
-      }
+      setHighScore(current => leader.score > current ? leader.score : current);
     }
-  };
+  }, [previousLeader]);
 
 
   return (

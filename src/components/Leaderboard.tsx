@@ -30,6 +30,37 @@ export interface LeaderboardRef {
 
 type FilterType = 'all' | 'myGroup';
 
+// 메모화된 테이블 컴포넌트로 불필요한 리렌더링 방지
+const LeaderboardTable = React.memo<{
+  filteredScores: ScoreEntry[];
+  showAsModal: boolean;
+}>(({ filteredScores, showAsModal }) => (
+  <table className={showAsModal ? "leaderboard-table" : "leaderboard-table-inline"}>
+    <thead>
+      <tr>
+        <th className="rank">순위</th>
+        <th>이름</th>
+        <th className="score">점수</th>
+        <th>그룹</th>
+        {showAsModal && <th>날짜</th>}
+      </tr>
+    </thead>
+    <tbody>
+      {filteredScores.map((entry, index) => (
+        <tr key={entry.id || index}>
+          <td className="rank">{index + 1}</td>
+          <td>{entry.value?.name || 'N/A'}</td>
+          <td className="score">{entry.key ?? 'N/A'}</td>
+          <td className="channel">{entry.value?.channel || '기본'}</td>
+          {showAsModal && (
+            <td>{entry.value?.createdAt ? new Date(entry.value.createdAt).toLocaleDateString() : 'N/A'}</td>
+          )}
+        </tr>
+      ))}
+    </tbody>
+  </table>
+));
+
 const Leaderboard = forwardRef<LeaderboardRef, LeaderboardProps>(({ 
   onClose, 
   showAsModal = true,
@@ -38,14 +69,23 @@ const Leaderboard = forwardRef<LeaderboardRef, LeaderboardProps>(({
 }, ref) => {
   const [filter, setFilter] = useState<FilterType>('all');
   const [scores, setScores] = useState<ScoreEntry[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [currentChannel, setCurrentChannel] = useState<string | null>(getCurrentChannel());
+  const [showLoading, setShowLoading] = useState<boolean>(false);
   
   // DB에서 리더보드 데이터 조회
-  const fetchLeaderboardData = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
+  const fetchLeaderboardData = useCallback(async (shouldShowLoading = true) => {
+    let loadingTimer: number | null = null;
+    
+    if (shouldShowLoading) {
+      setIsLoading(true);
+      setError(null);
+      // 짧은 로딩 시간에는 로딩 인디케이터를 표시하지 않음
+      loadingTimer = setTimeout(() => {
+        setShowLoading(true);
+      }, 200);
+    }
     
     // 내 그룹 필터의 경우 더 많은 데이터를 가져와서 클라이언트에서 필터링
     const limit = (filter === 'myGroup' && currentChannel) ? 50 : 10;
@@ -87,7 +127,11 @@ const Leaderboard = forwardRef<LeaderboardRef, LeaderboardProps>(({
       setError(`Could not load leaderboard data. Please try again later. Error: ${errorMessage}`);
       setScores([]);
     } finally {
-      setIsLoading(false);
+      if (shouldShowLoading) {
+        if (loadingTimer) clearTimeout(loadingTimer);
+        setIsLoading(false);
+        setShowLoading(false);
+      }
     }
   }, [filter, currentChannel, onLeaderFetched]);
 
@@ -106,7 +150,7 @@ const Leaderboard = forwardRef<LeaderboardRef, LeaderboardProps>(({
 
   // ref를 통해 외부에서 새로고침 호출 가능
   useImperativeHandle(ref, () => ({
-    refresh: fetchLeaderboardData
+    refresh: () => fetchLeaderboardData(false) // 외부 호출 시 로딩 상태 표시하지 않음
   }));
   
   // 채널이 없는데 myGroup 필터가 선택되어 있으면 all로 변경
@@ -138,8 +182,7 @@ const Leaderboard = forwardRef<LeaderboardRef, LeaderboardProps>(({
     }
     
     setFilter(newFilter);
-    // 필터 변경 후 데이터 새로고침
-    setTimeout(() => fetchLeaderboardData(), 0);
+    // fetchLeaderboardData는 useEffect에서 filter 변경을 감지하여 자동 호출됨
   };
 
   // 그룹 공유 핸들러
@@ -152,7 +195,7 @@ const Leaderboard = forwardRef<LeaderboardRef, LeaderboardProps>(({
     }
     
     const currentUrl = window.location.origin + window.location.pathname;
-    const shareUrl = `${currentUrl}?channel=${encodeURIComponent(channelToShare)}`;
+    const shareUrl = `${currentUrl}?channel=${encodeURIComponent(channelToShare || 'default')}`;
     
     if (navigator.share) {
       // 네이티브 공유 API 사용 (모바일)
@@ -209,7 +252,7 @@ const Leaderboard = forwardRef<LeaderboardRef, LeaderboardProps>(({
         </div>
       </div>
 
-      {isLoading && <p className="leaderboard-message">Loading leaderboard...</p>}
+      {showLoading && <p className="leaderboard-message">Loading leaderboard...</p>}
       {error && <p className="leaderboard-message error">{error}</p>}
       {!isLoading && !error && filteredScores.length === 0 && (
         <p className="leaderboard-message">
@@ -218,31 +261,11 @@ const Leaderboard = forwardRef<LeaderboardRef, LeaderboardProps>(({
             : `📊 "${currentChannel}" 그룹의 점수가 아직 없습니다.\n게임을 플레이해서 첫 기록을 남겨보세요!`}
         </p>
       )}
-      {!isLoading && !error && filteredScores.length > 0 && (
-        <table className={showAsModal ? "leaderboard-table" : "leaderboard-table-inline"}>
-          <thead>
-            <tr>
-              <th className="rank">순위</th>
-              <th>이름</th>
-              <th className="score">점수</th>
-              <th>그룹</th>
-              {showAsModal && <th>날짜</th>}
-            </tr>
-          </thead>
-          <tbody>
-            {filteredScores.map((entry, index) => (
-              <tr key={entry.id || index}>
-                <td className="rank">{index + 1}</td>
-                <td>{entry.value?.name || 'N/A'}</td>
-                <td className="score">{entry.key ?? 'N/A'}</td>
-                <td className="channel">{entry.value?.channel || '기본'}</td>
-                {showAsModal && (
-                  <td>{entry.value?.createdAt ? new Date(entry.value.createdAt).toLocaleDateString() : 'N/A'}</td>
-                )}
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      {!showLoading && !error && filteredScores.length > 0 && (
+        <LeaderboardTable 
+          filteredScores={filteredScores} 
+          showAsModal={showAsModal} 
+        />
       )}
       
       {/* 그룹 공유 버튼 - 내 그룹 필터 선택시에만 표시 */}
