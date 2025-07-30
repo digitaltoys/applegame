@@ -30,8 +30,10 @@
 }
 
 .buttons {
-  /* margin-top: 30px; */
+  margin-top: 30px;
   margin-bottom: 20px; /* Add some space at the bottom */
+  position: relative;
+  z-index: 10; /* Ensure buttons are above leaderboard */
 }
 
 .buttons button {
@@ -146,6 +148,9 @@
 /* GameOverScreen specific overrides for leaderboard */
 .game-over-screen .leaderboard-container-inline {
   margin-top: 30px;
+  position: relative;
+  z-index: 1; /* Lower z-index than buttons */
+  margin-bottom: 20px; /* Add bottom margin to create space before buttons */
 }
 
 
