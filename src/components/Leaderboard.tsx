@@ -85,7 +85,7 @@ const Leaderboard = forwardRef<LeaderboardRef, LeaderboardProps>(({
       }, 200);
     }
     
-    // 내 그룹 필터의 경우 더 많은 데이터를 가져와서 클라이언트에서 필터링
+    // 내 친구 필터의 경우 더 많은 데이터를 가져와서 클라이언트에서 필터링
     const limit = (filter === 'myGroup' && currentChannel) ? 50 : 10;
     
     // 선택된 룰이 있으면 룰별 뷰 사용, 없으면 기본 뷰 사용
@@ -186,7 +186,7 @@ const Leaderboard = forwardRef<LeaderboardRef, LeaderboardProps>(({
 
   // 필터 변경 핸들러
   const handleFilterChange = (newFilter: FilterType) => {
-    // 내 그룹 선택시 채널이 없으면 랜덤 생성
+    // 내 친구 선택시 채널이 없으면 랜덤 생성
     if (newFilter === 'myGroup' && !currentChannel) {
       const newChannel = ensureChannel();
       setCurrentChannel(newChannel);
@@ -258,7 +258,7 @@ const Leaderboard = forwardRef<LeaderboardRef, LeaderboardProps>(({
             disabled={false}
             title=""
           >
-            내 그룹
+            내 친구
           </button>
         </div>
       </div>
@@ -279,7 +279,7 @@ const Leaderboard = forwardRef<LeaderboardRef, LeaderboardProps>(({
         />
       )}
       
-      {/* 그룹 공유 버튼 - 내 그룹 필터 선택시에만 표시 */}
+      {/* 그룹 공유 버튼 - 내 친구 필터 선택시에만 표시 */}
       {currentChannel && filter === 'myGroup' && (
         <div className="group-share-container">
           <button onClick={handleGroupShare} className="group-share-button">
