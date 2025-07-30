@@ -213,6 +213,7 @@ const GameOverScreen: React.FC<GameOverScreenProps> = ({ score, selectedRule, on
         ref={leaderboardRef}
         showAsModal={false}
         onLeaderFetched={handleLeaderFetched}
+        selectedRule={selectedRule}
       />
 
       <div className="buttons">

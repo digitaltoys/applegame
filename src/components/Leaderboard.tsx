@@ -22,6 +22,7 @@ interface LeaderboardProps {
   showAsModal?: boolean; // true: 오버레이 모달, false: 인라인 표시
   autoRefresh?: boolean; // 자동 새로고침 여부
   onLeaderFetched?: (leader: { name: string; score: number } | null) => void; // 리더 정보 콜백
+  selectedRule?: string; // 필터링할 게임 룰
 }
 
 export interface LeaderboardRef {
@@ -41,8 +42,7 @@ const LeaderboardTable = React.memo<{
         <th className="rank">순위</th>
         <th>이름</th>
         <th className="score">점수</th>
-        <th>그룹</th>
-        {showAsModal && <th>날짜</th>}
+        <th>날짜</th>
       </tr>
     </thead>
     <tbody>
@@ -50,11 +50,8 @@ const LeaderboardTable = React.memo<{
         <tr key={entry.id || index}>
           <td className="rank">{index + 1}</td>
           <td>{entry.value?.name || 'N/A'}</td>
-          <td className="score">{entry.key ?? 'N/A'}</td>
-          <td className="channel">{entry.value?.channel || '기본'}</td>
-          {showAsModal && (
-            <td>{entry.value?.createdAt ? new Date(entry.value.createdAt).toLocaleDateString() : 'N/A'}</td>
-          )}
+          <td className="score">{Array.isArray(entry.key) ? entry.key[1] : entry.key ?? 'N/A'}</td>
+          <td>{entry.value?.createdAt ? new Date(entry.value.createdAt).toLocaleDateString() : 'N/A'}</td>
         </tr>
       ))}
     </tbody>
@@ -65,7 +62,8 @@ const Leaderboard = forwardRef<LeaderboardRef, LeaderboardProps>(({
   onClose, 
   showAsModal = true,
   autoRefresh = false,
-  onLeaderFetched
+  onLeaderFetched,
+  selectedRule
 }, ref) => {
   const [filter, setFilter] = useState<FilterType>('all');
   const [scores, setScores] = useState<ScoreEntry[]>([]);
@@ -89,7 +87,17 @@ const Leaderboard = forwardRef<LeaderboardRef, LeaderboardProps>(({
     
     // 내 그룹 필터의 경우 더 많은 데이터를 가져와서 클라이언트에서 필터링
     const limit = (filter === 'myGroup' && currentChannel) ? 50 : 10;
-    const url = `http://couchdb.ioplug.net/scoredb/_design/scores/_view/by_score?descending=true&limit=${limit}`;
+    
+    // 선택된 룰이 있으면 룰별 뷰 사용, 없으면 기본 뷰 사용
+    let url: string;
+    if (selectedRule) {
+      // by_rule_score 뷰를 사용하여 특정 룰의 점수만 조회
+      const startKey = encodeURIComponent(`["${selectedRule}",{}]`);
+      const endKey = encodeURIComponent(`["${selectedRule}"]`);
+      url = `http://couchdb.ioplug.net/scoredb/_design/scores/_view/by_rule_score?startkey=${startKey}&endkey=${endKey}&descending=true&limit=${limit}`;
+    } else {
+      url = `http://couchdb.ioplug.net/scoredb/_design/scores/_view/by_score?descending=true&limit=${limit}`;
+    }
 
     try {
       const response = await fetch(url, {
@@ -117,7 +125,10 @@ const Leaderboard = forwardRef<LeaderboardRef, LeaderboardProps>(({
       // 리더 정보 콜백 호출
       if (onLeaderFetched) {
         const leader = fetchedScores.length > 0 
-          ? { name: fetchedScores[0].value?.name || '', score: fetchedScores[0].key || 0 }
+          ? { 
+              name: fetchedScores[0].value?.name || '', 
+              score: Array.isArray(fetchedScores[0].key) ? fetchedScores[0].key[1] : fetchedScores[0].key || 0 
+            }
           : null;
         onLeaderFetched(leader);
       }
@@ -133,7 +144,7 @@ const Leaderboard = forwardRef<LeaderboardRef, LeaderboardProps>(({
         setShowLoading(false);
       }
     }
-  }, [filter, currentChannel, onLeaderFetched]);
+  }, [filter, currentChannel, onLeaderFetched, selectedRule]);
 
   // 컴포넌트 마운트 시 데이터 로드
   useEffect(() => {
