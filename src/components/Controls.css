@@ -1,7 +1,7 @@
 /* src/components/Controls.css */
 .controls {
   display: flex;
-  gap: 10px; /* Space between buttons */
+  gap: 50px; /* Space between buttons */
 }
 .controls button {
   padding: 10px 15px;
