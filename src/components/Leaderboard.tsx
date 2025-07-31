@@ -197,7 +197,7 @@ const Leaderboard = forwardRef<LeaderboardRef, LeaderboardProps>(({
   };
 
   // 그룹 공유 핸들러
-  const handleGroupShare = () => {
+  const handleGroupShare = async () => {
     // 채널이 없으면 랜덤 생성
     let channelToShare = currentChannel;
     if (!channelToShare) {
@@ -207,34 +207,67 @@ const Leaderboard = forwardRef<LeaderboardRef, LeaderboardProps>(({
     
     const currentUrl = window.location.origin + window.location.pathname;
     const shareUrl = `${currentUrl}?channel=${encodeURIComponent(channelToShare || 'default')}`;
+    const shareData = {
+      title: 'Apple Collector Game',
+      text: `"${channelToShare}" 그룹에 참여해서 같이 게임해요!`,
+      url: shareUrl
+    };
     
-    if (navigator.share) {
-      // 네이티브 공유 API 사용 (모바일)
-      navigator.share({
-        title: 'Apple Collector Game',
-        text: `"${channelToShare}" 그룹에 참여해서 같이 게임해요!`,
-        url: shareUrl
-      }).catch(console.error);
+    // HTTPS 체크
+    const isHttps = location.protocol === 'https:' || location.hostname === 'localhost';
+    
+    if (navigator.share && isHttps) {
+      try {
+        console.log('Web Share API 시도:', shareData);
+        await navigator.share(shareData);
+        console.log('공유 성공');
+      } catch (error) {
+        console.error('Web Share API 에러:', error);
+        // Web Share API 실패 시 폴백
+        await fallbackShare(shareUrl);
+      }
     } else {
-      // 클립보드에 복사
-      navigator.clipboard.writeText(shareUrl).then(() => {
+      console.log('Web Share API 미지원 또는 HTTP 환경, 폴백 사용');
+      await fallbackShare(shareUrl);
+    }
+  };
+
+  // 폴백 공유 함수
+  const fallbackShare = async (shareUrl: string) => {
+    try {
+      // 먼저 최신 Clipboard API 시도
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(shareUrl);
         alert('그룹 링크가 클립보드에 복사되었습니다!');
-      }).catch(() => {
-        // 클립보드 복사 실패 시 임시 텍스트 영역 사용
-        const textArea = document.createElement('textarea');
-        textArea.value = shareUrl;
-        document.body.appendChild(textArea);
-        textArea.focus();
-        textArea.select();
-        try {
-          document.execCommand('copy');
-          alert('그룹 링크가 클립보드에 복사되었습니다!');
-        } catch (err) {
-          console.error('클립보드 복사 실패:', err);
-          alert(`그룹 링크: ${shareUrl}`);
-        }
-        document.body.removeChild(textArea);
-      });
+        return;
+      }
+    } catch (error) {
+      console.error('Clipboard API 실패:', error);
+    }
+    
+    // Clipboard API 실패 시 레거시 방법 사용
+    const textArea = document.createElement('textarea');
+    textArea.value = shareUrl;
+    textArea.style.position = 'fixed';
+    textArea.style.left = '-999999px';
+    textArea.style.top = '-999999px';
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    
+    try {
+      const successful = document.execCommand('copy');
+      if (successful) {
+        alert('그룹 링크가 클립보드에 복사되었습니다!');
+      } else {
+        throw new Error('execCommand copy failed');
+      }
+    } catch (err) {
+      console.error('모든 복사 방법 실패:', err);
+      // 모든 방법 실패 시 URL 직접 표시
+      prompt('그룹 링크를 복사하세요:', shareUrl);
+    } finally {
+      document.body.removeChild(textArea);
     }
   };
 
