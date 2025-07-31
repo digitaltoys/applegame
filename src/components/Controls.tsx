@@ -8,7 +8,7 @@ interface ControlsProps {
   onMainMenu: () => void;
 }
 
-const Controls: React.FC<ControlsProps> = ({ onRestart, onMainMenu, onPauseToggle, isPaused }) => {
+const Controls: React.FC<ControlsProps> = ({ onRestart, onMainMenu }) => {
   return (
     <div className="controls">
       <button onClick={onRestart}>Restart</button>
