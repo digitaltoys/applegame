@@ -4,7 +4,7 @@ import './Controls.css'; // Import the CSS
 interface ControlsProps {
   onRestart: () => void;
   onPauseToggle: () => void;
-  isPaused: boolean;
+  isPaused: () => void;
   onMainMenu: () => void;
 }
 
