@@ -10,7 +10,7 @@
   "scope": "/",
   "icons": [
     {
-      "src": "/icons/apple.png",
+      "src": "/icons/favicon.png",
       "sizes": "256x256",
       "type": "image/png",
       "purpose": "maskable any"
