@@ -49,14 +49,14 @@ const Leaderboard = forwardRef<LeaderboardRef, LeaderboardProps>(({
     
     // 내 그룹 필터의 경우 더 많은 데이터를 가져와서 클라이언트에서 필터링
     const limit = (filter === 'myGroup' && currentChannel) ? 50 : 10;
-    const url = `http://couchdb.ioplug.net/scoredb/_design/scores/_view/by_score?descending=true&limit=${limit}`;
+    const url = `${import.meta.env.VITE_COUCHDB_URL}/${import.meta.env.VITE_COUCHDB_DATABASE}/_design/scores/_view/by_score?descending=true&limit=${limit}`;
 
     try {
       const response = await fetch(url, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Basic ${btoa('user1:any')}`,
+            'Authorization': `Basic ${btoa(`${import.meta.env.VITE_COUCHDB_USER}:${import.meta.env.VITE_COUCHDB_PASSWORD}`)}`,
           }
       });
       if (!response.ok) {

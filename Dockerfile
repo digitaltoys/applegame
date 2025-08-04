@@ -6,6 +6,18 @@ FROM node:18-alpine AS builder
 
 WORKDIR /app
 
+# Build arguments for environment variables
+ARG VITE_COUCHDB_URL
+ARG VITE_COUCHDB_DATABASE
+ARG VITE_COUCHDB_USER
+ARG VITE_COUCHDB_PASSWORD
+
+# Set environment variables from build args
+ENV VITE_COUCHDB_URL=$VITE_COUCHDB_URL
+ENV VITE_COUCHDB_DATABASE=$VITE_COUCHDB_DATABASE
+ENV VITE_COUCHDB_USER=$VITE_COUCHDB_USER
+ENV VITE_COUCHDB_PASSWORD=$VITE_COUCHDB_PASSWORD
+
 # 의존성 설치를 위해 package.json 파일을 먼저 복사
 COPY package.json ./
 COPY package-lock.json ./

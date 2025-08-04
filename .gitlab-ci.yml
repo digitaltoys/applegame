@@ -34,7 +34,23 @@ deploy-app:
     - docker stop $CONTAINER_NAME || true
     - docker rm $CONTAINER_NAME || true
     - echo "Building new Docker image..."
-    - docker build -t $WEB_IMAGE .
+    - docker build -t $WEB_IMAGE 
+      --build-arg VITE_COUCHDB_URL=$VITE_COUCHDB_URL
+      --build-arg VITE_COUCHDB_DATABASE=$VITE_COUCHDB_DATABASE
+      --build-arg VITE_COUCHDB_USER=$VITE_COUCHDB_USER
+      --build-arg VITE_COUCHDB_PASSWORD=$VITE_COUCHDB_PASSWORD
+      .
     - echo "Running new container..."
-    - docker run -d --name $CONTAINER_NAME -p 62001:80 $WEB_IMAGE
+    - docker run -d --name $CONTAINER_NAME
+      --network traefik
+      --label "traefik.enable=true"
+      --label "traefik.http.routers.play-portal.rule=Host(\`play.ioplug.net\`)"
+      --label "traefik.http.routers.play-portal.entrypoints=websecure"
+      --label "traefik.http.routers.play-portal.tls.certresolver=letsencrypt"
+      --label "traefik.http.services.play-portal.loadbalancer.server.port=80"
+      -e VITE_COUCHDB_URL="$VITE_COUCHDB_URL"
+      -e VITE_COUCHDB_DATABASE="$VITE_COUCHDB_DATABASE"
+      -e VITE_COUCHDB_USER="$VITE_COUCHDB_USER"
+      -e VITE_COUCHDB_PASSWORD="$VITE_COUCHDB_PASSWORD"
+      $WEB_IMAGE
     - docker image prune -f

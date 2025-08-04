@@ -97,7 +97,7 @@ const GameOverScreen: React.FC<GameOverScreenProps> = ({ score, selectedRule, on
       // setPlayerName('');
 
       // Send to CouchDB
-      const couchDbUrl = 'http://couchdb.ioplug.net/scoredb';
+      const couchDbUrl = `${import.meta.env.VITE_COUCHDB_URL}/${import.meta.env.VITE_COUCHDB_DATABASE}`;
       const scoreDataForDb = {
         type: 'score',
         name: trimmedPlayerName, // Use trimmed name for saving to DB
@@ -114,7 +114,7 @@ const GameOverScreen: React.FC<GameOverScreenProps> = ({ score, selectedRule, on
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Basic ${btoa('user1:any')}`, // Replace with actual credentials
+            'Authorization': `Basic ${btoa(`${import.meta.env.VITE_COUCHDB_USER}:${import.meta.env.VITE_COUCHDB_PASSWORD}`)}`
           },
           body: JSON.stringify(scoreDataForDb),
         });

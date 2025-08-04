@@ -42,8 +42,8 @@ class LeaderboardMonitor {
   private pollInterval: number | null = null;
   private fallbackPollingEnabled: boolean = false;
 
-  private readonly couchDbUrl = 'http://couchdb.ioplug.net/scoredb';
-  private readonly auth = 'Basic ' + btoa('user1:any');
+  private readonly couchDbUrl = `${import.meta.env.VITE_COUCHDB_URL}/${import.meta.env.VITE_COUCHDB_DATABASE}`;
+  private readonly auth = 'Basic ' + btoa(`${import.meta.env.VITE_COUCHDB_USER}:${import.meta.env.VITE_COUCHDB_PASSWORD}`);
 
   constructor() {
     this.initializeCurrentLeader();
