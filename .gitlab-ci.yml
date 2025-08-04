@@ -44,7 +44,7 @@ deploy-app:
     - docker run -d --name $CONTAINER_NAME
       --network traefik
       --label "traefik.enable=true"
-      --label "traefik.http.routers.play-portal.rule=Host(\`play.ioplug.net\`)"
+      --label "traefik.http.routers.play-portal.rule=Host(\`applegame.ioplug.net\`)"
       --label "traefik.http.routers.play-portal.entrypoints=websecure"
       --label "traefik.http.routers.play-portal.tls.certresolver=letsencrypt"
       --label "traefik.http.services.play-portal.loadbalancer.server.port=80"
