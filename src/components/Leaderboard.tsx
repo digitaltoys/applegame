@@ -94,9 +94,9 @@ const Leaderboard = forwardRef<LeaderboardRef, LeaderboardProps>(({
       // by_rule_score 뷰를 사용하여 특정 룰의 점수만 조회
       const startKey = encodeURIComponent(`["${selectedRule}",{}]`);
       const endKey = encodeURIComponent(`["${selectedRule}"]`);
-      url = `http://couchdb.ioplug.net/scoredb/_design/scores/_view/by_rule_score?startkey=${startKey}&endkey=${endKey}&descending=true&limit=${limit}`;
+      url = `${import.meta.env.VITE_COUCHDB_URL}/${import.meta.env.VITE_COUCHDB_DATABASE}/_design/scores/_view/by_rule_score?startkey=${startKey}&endkey=${endKey}&descending=true&limit=${limit}`;
     } else {
-      url = `http://couchdb.ioplug.net/scoredb/_design/scores/_view/by_score?descending=true&limit=${limit}`;
+      url = `${import.meta.env.VITE_COUCHDB_URL}/${import.meta.env.VITE_COUCHDB_DATABASE}/_design/scores/_view/by_score?descending=true&limit=${limit}`;
     }
 
     try {
@@ -104,7 +104,7 @@ const Leaderboard = forwardRef<LeaderboardRef, LeaderboardProps>(({
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Basic ${btoa('user1:any')}`,
+            'Authorization': `Basic ${btoa(`${import.meta.env.VITE_COUCHDB_USER}:${import.meta.env.VITE_COUCHDB_PASSWORD}`)}`,
           }
       });
       if (!response.ok) {
