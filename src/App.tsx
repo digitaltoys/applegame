@@ -210,6 +210,7 @@ function App() {
               onRestart={handleRestart}
               onPauseToggle={handlePauseToggle}
               isPaused={isPaused}
+              onMainMenu={handleMainMenu}
             />
           </footer>
         </>

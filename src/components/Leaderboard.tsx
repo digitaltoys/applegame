@@ -22,6 +22,7 @@ interface LeaderboardProps {
   showAsModal?: boolean; // true: 오버레이 모달, false: 인라인 표시
   autoRefresh?: boolean; // 자동 새로고침 여부
   onLeaderFetched?: (leader: { name: string; score: number } | null) => void; // 리더 정보 콜백
+  selectedRule?: string; // 필터링할 게임 룰
 }
 
 export interface LeaderboardRef {
@@ -30,26 +31,73 @@ export interface LeaderboardRef {
 
 type FilterType = 'all' | 'myGroup';
 
+// 메모화된 테이블 컴포넌트로 불필요한 리렌더링 방지
+const LeaderboardTable = React.memo<{
+  filteredScores: ScoreEntry[];
+  showAsModal: boolean;
+}>(({ filteredScores, showAsModal }) => (
+  <table className={showAsModal ? "leaderboard-table" : "leaderboard-table-inline"}>
+    <thead>
+      <tr>
+        <th className="rank">순위</th>
+        <th>이름</th>
+        <th className="score">점수</th>
+        <th>날짜</th>
+      </tr>
+    </thead>
+    <tbody>
+      {filteredScores.map((entry, index) => (
+        <tr key={entry.id || index}>
+          <td className="rank">{index + 1}</td>
+          <td>{entry.value?.name || 'N/A'}</td>
+          <td className="score">{Array.isArray(entry.key) ? entry.key[1] : entry.key ?? 'N/A'}</td>
+          <td>{entry.value?.createdAt ? new Date(entry.value.createdAt).toLocaleDateString() : 'N/A'}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+));
+
 const Leaderboard = forwardRef<LeaderboardRef, LeaderboardProps>(({ 
   onClose, 
   showAsModal = true,
   autoRefresh = false,
-  onLeaderFetched
+  onLeaderFetched,
+  selectedRule
 }, ref) => {
   const [filter, setFilter] = useState<FilterType>('all');
   const [scores, setScores] = useState<ScoreEntry[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [currentChannel, setCurrentChannel] = useState<string | null>(getCurrentChannel());
+  const [showLoading, setShowLoading] = useState<boolean>(false);
   
   // DB에서 리더보드 데이터 조회
-  const fetchLeaderboardData = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
+  const fetchLeaderboardData = useCallback(async (shouldShowLoading = true) => {
+    let loadingTimer: number | null = null;
     
-    // 내 그룹 필터의 경우 더 많은 데이터를 가져와서 클라이언트에서 필터링
+    if (shouldShowLoading) {
+      setIsLoading(true);
+      setError(null);
+      // 짧은 로딩 시간에는 로딩 인디케이터를 표시하지 않음
+      loadingTimer = setTimeout(() => {
+        setShowLoading(true);
+      }, 200);
+    }
+    
+    // 내 친구 필터의 경우 더 많은 데이터를 가져와서 클라이언트에서 필터링
     const limit = (filter === 'myGroup' && currentChannel) ? 50 : 10;
-    const url = `${import.meta.env.VITE_COUCHDB_URL}/${import.meta.env.VITE_COUCHDB_DATABASE}/_design/scores/_view/by_score?descending=true&limit=${limit}`;
+    
+    // 선택된 룰이 있으면 룰별 뷰 사용, 없으면 기본 뷰 사용
+    let url: string;
+    if (selectedRule) {
+      // by_rule_score 뷰를 사용하여 특정 룰의 점수만 조회
+      const startKey = encodeURIComponent(`["${selectedRule}",{}]`);
+      const endKey = encodeURIComponent(`["${selectedRule}"]`);
+      url = `${import.meta.env.VITE_COUCHDB_URL}/${import.meta.env.VITE_COUCHDB_DATABASE}/_design/scores/_view/by_rule_score?startkey=${startKey}&endkey=${endKey}&descending=true&limit=${limit}`;
+    } else {
+      url = `${import.meta.env.VITE_COUCHDB_URL}/${import.meta.env.VITE_COUCHDB_DATABASE}/_design/scores/_view/by_score?descending=true&limit=${limit}`;
+    }
 
     try {
       const response = await fetch(url, {
@@ -77,7 +125,10 @@ const Leaderboard = forwardRef<LeaderboardRef, LeaderboardProps>(({
       // 리더 정보 콜백 호출
       if (onLeaderFetched) {
         const leader = fetchedScores.length > 0 
-          ? { name: fetchedScores[0].value?.name || '', score: fetchedScores[0].key || 0 }
+          ? { 
+              name: fetchedScores[0].value?.name || '', 
+              score: Array.isArray(fetchedScores[0].key) ? fetchedScores[0].key[1] : fetchedScores[0].key || 0 
+            }
           : null;
         onLeaderFetched(leader);
       }
@@ -87,9 +138,13 @@ const Leaderboard = forwardRef<LeaderboardRef, LeaderboardProps>(({
       setError(`Could not load leaderboard data. Please try again later. Error: ${errorMessage}`);
       setScores([]);
     } finally {
-      setIsLoading(false);
+      if (shouldShowLoading) {
+        if (loadingTimer) clearTimeout(loadingTimer);
+        setIsLoading(false);
+        setShowLoading(false);
+      }
     }
-  }, [filter, currentChannel, onLeaderFetched]);
+  }, [filter, currentChannel, onLeaderFetched, selectedRule]);
 
   // 컴포넌트 마운트 시 데이터 로드
   useEffect(() => {
@@ -106,7 +161,7 @@ const Leaderboard = forwardRef<LeaderboardRef, LeaderboardProps>(({
 
   // ref를 통해 외부에서 새로고침 호출 가능
   useImperativeHandle(ref, () => ({
-    refresh: fetchLeaderboardData
+    refresh: () => fetchLeaderboardData(false) // 외부 호출 시 로딩 상태 표시하지 않음
   }));
   
   // 채널이 없는데 myGroup 필터가 선택되어 있으면 all로 변경
@@ -131,19 +186,18 @@ const Leaderboard = forwardRef<LeaderboardRef, LeaderboardProps>(({
 
   // 필터 변경 핸들러
   const handleFilterChange = (newFilter: FilterType) => {
-    // 내 그룹 선택시 채널이 없으면 랜덤 생성
+    // 내 친구 선택시 채널이 없으면 랜덤 생성
     if (newFilter === 'myGroup' && !currentChannel) {
       const newChannel = ensureChannel();
       setCurrentChannel(newChannel);
     }
     
     setFilter(newFilter);
-    // 필터 변경 후 데이터 새로고침
-    setTimeout(() => fetchLeaderboardData(), 0);
+    // fetchLeaderboardData는 useEffect에서 filter 변경을 감지하여 자동 호출됨
   };
 
   // 그룹 공유 핸들러
-  const handleGroupShare = () => {
+  const handleGroupShare = async () => {
     // 채널이 없으면 랜덤 생성
     let channelToShare = currentChannel;
     if (!channelToShare) {
@@ -152,35 +206,68 @@ const Leaderboard = forwardRef<LeaderboardRef, LeaderboardProps>(({
     }
     
     const currentUrl = window.location.origin + window.location.pathname;
-    const shareUrl = `${currentUrl}?channel=${encodeURIComponent(channelToShare)}`;
+    const shareUrl = `${currentUrl}?channel=${encodeURIComponent(channelToShare || 'default')}`;
+    const shareData = {
+      title: 'Apple Collector Game',
+      text: `"${channelToShare}" 그룹에 참여해서 같이 게임해요!`,
+      url: shareUrl
+    };
     
-    if (navigator.share) {
-      // 네이티브 공유 API 사용 (모바일)
-      navigator.share({
-        title: 'Apple Collector Game',
-        text: `"${channelToShare}" 그룹에 참여해서 같이 게임해요!`,
-        url: shareUrl
-      }).catch(console.error);
+    // HTTPS 체크
+    const isHttps = location.protocol === 'https:' || location.hostname === 'localhost';
+    
+    if (navigator.share && isHttps) {
+      try {
+        console.log('Web Share API 시도:', shareData);
+        await navigator.share(shareData);
+        console.log('공유 성공');
+      } catch (error) {
+        console.error('Web Share API 에러:', error);
+        // Web Share API 실패 시 폴백
+        await fallbackShare(shareUrl);
+      }
     } else {
-      // 클립보드에 복사
-      navigator.clipboard.writeText(shareUrl).then(() => {
+      console.log('Web Share API 미지원 또는 HTTP 환경, 폴백 사용');
+      await fallbackShare(shareUrl);
+    }
+  };
+
+  // 폴백 공유 함수
+  const fallbackShare = async (shareUrl: string) => {
+    try {
+      // 먼저 최신 Clipboard API 시도
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(shareUrl);
         alert('그룹 링크가 클립보드에 복사되었습니다!');
-      }).catch(() => {
-        // 클립보드 복사 실패 시 임시 텍스트 영역 사용
-        const textArea = document.createElement('textarea');
-        textArea.value = shareUrl;
-        document.body.appendChild(textArea);
-        textArea.focus();
-        textArea.select();
-        try {
-          document.execCommand('copy');
-          alert('그룹 링크가 클립보드에 복사되었습니다!');
-        } catch (err) {
-          console.error('클립보드 복사 실패:', err);
-          alert(`그룹 링크: ${shareUrl}`);
-        }
-        document.body.removeChild(textArea);
-      });
+        return;
+      }
+    } catch (error) {
+      console.error('Clipboard API 실패:', error);
+    }
+    
+    // Clipboard API 실패 시 레거시 방법 사용
+    const textArea = document.createElement('textarea');
+    textArea.value = shareUrl;
+    textArea.style.position = 'fixed';
+    textArea.style.left = '-999999px';
+    textArea.style.top = '-999999px';
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    
+    try {
+      const successful = document.execCommand('copy');
+      if (successful) {
+        alert('그룹 링크가 클립보드에 복사되었습니다!');
+      } else {
+        throw new Error('execCommand copy failed');
+      }
+    } catch (err) {
+      console.error('모든 복사 방법 실패:', err);
+      // 모든 방법 실패 시 URL 직접 표시
+      prompt('그룹 링크를 복사하세요:', shareUrl);
+    } finally {
+      document.body.removeChild(textArea);
     }
   };
 
@@ -204,12 +291,12 @@ const Leaderboard = forwardRef<LeaderboardRef, LeaderboardProps>(({
             disabled={false}
             title=""
           >
-            내 그룹
+            내 친구
           </button>
         </div>
       </div>
 
-      {isLoading && <p className="leaderboard-message">Loading leaderboard...</p>}
+      {showLoading && <p className="leaderboard-message">Loading leaderboard...</p>}
       {error && <p className="leaderboard-message error">{error}</p>}
       {!isLoading && !error && filteredScores.length === 0 && (
         <p className="leaderboard-message">
@@ -218,34 +305,14 @@ const Leaderboard = forwardRef<LeaderboardRef, LeaderboardProps>(({
             : `📊 "${currentChannel}" 그룹의 점수가 아직 없습니다.\n게임을 플레이해서 첫 기록을 남겨보세요!`}
         </p>
       )}
-      {!isLoading && !error && filteredScores.length > 0 && (
-        <table className={showAsModal ? "leaderboard-table" : "leaderboard-table-inline"}>
-          <thead>
-            <tr>
-              <th className="rank">순위</th>
-              <th>이름</th>
-              <th className="score">점수</th>
-              <th>그룹</th>
-              {showAsModal && <th>날짜</th>}
-            </tr>
-          </thead>
-          <tbody>
-            {filteredScores.map((entry, index) => (
-              <tr key={entry.id || index}>
-                <td className="rank">{index + 1}</td>
-                <td>{entry.value?.name || 'N/A'}</td>
-                <td className="score">{entry.key ?? 'N/A'}</td>
-                <td className="channel">{entry.value?.channel || '기본'}</td>
-                {showAsModal && (
-                  <td>{entry.value?.createdAt ? new Date(entry.value.createdAt).toLocaleDateString() : 'N/A'}</td>
-                )}
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      {!showLoading && !error && filteredScores.length > 0 && (
+        <LeaderboardTable 
+          filteredScores={filteredScores} 
+          showAsModal={showAsModal} 
+        />
       )}
       
-      {/* 그룹 공유 버튼 - 내 그룹 필터 선택시에만 표시 */}
+      {/* 그룹 공유 버튼 - 내 친구 필터 선택시에만 표시 */}
       {currentChannel && filter === 'myGroup' && (
         <div className="group-share-container">
           <button onClick={handleGroupShare} className="group-share-button">

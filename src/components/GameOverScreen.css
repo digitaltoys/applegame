@@ -4,7 +4,7 @@
   align-items: center;
   /* justify-content: center; */
   width: 100vw;
-  height: 100vh;
+  /* height: 100vh; */
   text-align: center;
   background-color: rgba(0, 0, 0, 0.8); /* 약간 어두운 배경 */
   color: white;
@@ -14,7 +14,7 @@
 
 .game-over-screen h1 {
   font-size: 3rem;
-  margin-bottom: 20px;
+  /* margin-bottom: 20px; */
 }
 
 .score-summary {
@@ -146,6 +146,7 @@
 /* GameOverScreen specific overrides for leaderboard */
 .game-over-screen .leaderboard-container-inline {
   margin-top: 30px;
+  /*margin-bottom: 30px;*/ /* Add bottom margin to create space before buttons */
 }
 
 

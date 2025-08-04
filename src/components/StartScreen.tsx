@@ -46,6 +46,7 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStartGame, selectedRule, on
 
       <Leaderboard 
         showAsModal={false}
+        selectedRule={selectedRule}
       />
       
       <NotificationSettings />
