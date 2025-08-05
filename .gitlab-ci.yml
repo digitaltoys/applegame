@@ -44,10 +44,10 @@ deploy-app:
     - docker run -d --name $CONTAINER_NAME
       --network traefik
       --label "traefik.enable=true"
-      --label "traefik.http.routers.play-portal.rule=Host(\`applegame.ioplug.net\`)"
-      --label "traefik.http.routers.play-portal.entrypoints=websecure"
-      --label "traefik.http.routers.play-portal.tls.certresolver=letsencrypt"
-      --label "traefik.http.services.play-portal.loadbalancer.server.port=80"
+      --label "traefik.http.routers.applegame.rule=Host(\`applegame.ioplug.net\`)"
+      --label "traefik.http.routers.applegame.entrypoints=websecure"
+      --label "traefik.http.routers.applegame.tls.certresolver=letsencrypt"
+      --label "traefik.http.services.applegame.loadbalancer.server.port=80"
       -e VITE_COUCHDB_URL="$VITE_COUCHDB_URL"
       -e VITE_COUCHDB_DATABASE="$VITE_COUCHDB_DATABASE"
       -e VITE_COUCHDB_USER="$VITE_COUCHDB_USER"
