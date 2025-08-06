@@ -17,11 +17,19 @@ import { useEffect, useRef } from "react";
 //       );
 // }
 
+// 전역 플래그로 중복 생성 방지
+let isAdInitialized = false;
+
 export function CoupangAd() {
   const adRef = useRef(null);
   console.log("✅ 쿠팡");
 
   useEffect(() => {
+    // 이미 광고가 초기화되었으면 중복 실행 방지
+    if (isAdInitialized) {
+      console.log("🚫 쿠팡 광고 이미 초기화됨, 중복 생성 방지");
+      return;
+    }
     // DOM 이동 함수 (강화된 버전)
     const moveAdToContainer = () => {
       let attempts = 0;
@@ -100,7 +108,7 @@ export function CoupangAd() {
     // 이미 스크립트가 로드되었는지 확인
     if (window.PartnersCoupang || document.querySelector('script[src="https://ads-partners.coupang.com/g.js"]')) {
       console.log("✅ 쿠팡 스크립트 이미 로드됨");
-      if (window.PartnersCoupang) {
+      if (window.PartnersCoupang && !isAdInitialized) {
         // 스크립트가 이미 있으면 바로 광고 생성
         new window.PartnersCoupang.G({
           id: 898377,
@@ -112,6 +120,7 @@ export function CoupangAd() {
           target: adRef.current
         });
         moveAdToContainer(); // 백업 이동
+        isAdInitialized = true; // 플래그 설정
       }
       return;
     }
@@ -123,17 +132,20 @@ export function CoupangAd() {
     script.onload = () => {
       console.log("✅ 쿠팡 스크립트 로드됨 (첫 번째)");
       console.log("window.PartnersCoupang:", window.PartnersCoupang);
-      // 2. 광고 생성
-      new window.PartnersCoupang.G({
-        id: 898377,
-        template: "carousel",
-        trackingCode: "AF1491932",
-        width: "100%",
-        height: "60",
-        tsource: "",
-        target: adRef.current
-      });
-      moveAdToContainer(); // 백업 이동
+      // 2. 광고 생성 (중복 방지 체크)
+      if (!isAdInitialized) {
+        new window.PartnersCoupang.G({
+          id: 898377,
+          template: "carousel",
+          trackingCode: "AF1491932",
+          width: "100%",
+          height: "60",
+          tsource: "",
+          target: adRef.current
+        });
+        moveAdToContainer(); // 백업 이동
+        isAdInitialized = true; // 플래그 설정
+      }
     };
 
     script.onerror = () => {
