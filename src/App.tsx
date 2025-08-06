@@ -12,6 +12,7 @@ import leaderboardMonitor from './utils/leaderboardMonitor';
 import { getNotificationEnabled } from './utils/notifications';
 import { initializeChannel } from './utils/channel';
 import { type GameRule, GAME_RULES } from './types/gameRules';
+import { CoupangAd } from './components/CoupangAd.jsx'
 
 // Define INITIAL_TIME_LEFT constant
 const INITIAL_TIME_LEFT = 60;
@@ -62,7 +63,7 @@ function App() {
   // useEffect for combo timeout check
   useEffect(() => {
     const COMBO_TIME_WINDOW = 3000; // 3초
-    
+
     const comboTimeoutCheck = setInterval(() => {
       if (gameState === 'Playing' && !isPaused && comboCount > 1 && lastRemoveTime > 0) {
         const timeSinceLastRemove = Date.now() - lastRemoveTime;
@@ -80,7 +81,7 @@ function App() {
   useEffect(() => {
     // 채널 초기화
     initializeChannel();
-    
+
     // 알림 설정이 활성화된 경우에만 모니터링 시작
     if (getNotificationEnabled()) {
       console.log('리더보드 모니터링 시작');
@@ -170,7 +171,7 @@ function App() {
   return (
     <div className="app-container">
       {gameState === 'StartScreen' ? (
-        <StartScreen 
+        <StartScreen
           onStartGame={handleStartGame}
           selectedRule={selectedRule}
           onRuleChange={setSelectedRule}
@@ -190,11 +191,11 @@ function App() {
             {GAME_RULES[selectedRule].enableCombo && (
               <ComboDisplay comboCount={comboCount} lastRemoveTime={lastRemoveTime} />
             )}
-            <Grid 
-              setScore={setScore} 
-              setCurrentSum={setCurrentSum} 
-              key={gridKey} 
-              onGameWin={handleGameWin} 
+            <Grid
+              setScore={setScore}
+              setCurrentSum={setCurrentSum}
+              key={gridKey}
+              onGameWin={handleGameWin}
               isPaused={isPaused}
               comboCount={comboCount}
               setComboCount={setComboCount}
@@ -222,6 +223,7 @@ function App() {
           onMainMenu={handleMainMenu}
         />
       )}
+      <CoupangAd />
     </div>
   );
 }
