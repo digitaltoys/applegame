@@ -12,7 +12,7 @@ import leaderboardMonitor from './utils/leaderboardMonitor';
 import { getNotificationEnabled } from './utils/notifications';
 import { initializeChannel } from './utils/channel';
 import { type GameRule, GAME_RULES } from './types/gameRules';
-import { CoupangAd } from './components/CoupangAd.jsx'
+import { CoupangAd } from './components/CoupangAd'
 
 // Define INITIAL_TIME_LEFT constant
 const INITIAL_TIME_LEFT = 60;

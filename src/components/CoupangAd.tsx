@@ -1,5 +1,22 @@
-// CoupangAd.js
+// CoupangAd.tsx
 import { useEffect, useRef } from "react";
+
+// 쿠팡 파트너 API 타입 정의
+declare global {
+  interface Window {
+    PartnersCoupang?: {
+      G: new (config: {
+        id: number;
+        template: string;
+        trackingCode: string;
+        width: string;
+        height: string;
+        tsource: string;
+        target: HTMLElement | null;
+      }) => void;
+    };
+  }
+}
 
 // export const CoupangAd2 = function() {
 //       // console.log("✅ 쿠팡");
@@ -21,7 +38,7 @@ import { useEffect, useRef } from "react";
 let isAdInitialized = false;
 
 export function CoupangAd() {
-  const adRef = useRef(null);
+  const adRef = useRef<HTMLDivElement>(null);
   console.log("✅ 쿠팡");
 
   useEffect(() => {
@@ -54,14 +71,15 @@ export function CoupangAd() {
           const elements = document.querySelectorAll(selector);
           elements.forEach(ad => {
             // root와 같은 레벨(body의 직계 자식)에 있는 요소들 확인
-            if (ad.parentNode === document.body && ad.id !== 'root' && adRef.current) {
+            if (ad.parentNode === document.body && (ad as HTMLElement).id !== 'root' && adRef.current) {
               console.log("🔄 요소를 컨테이너로 이동:", ad);
               adRef.current.appendChild(ad);
 
               // 이동한 요소에 추가 스타일 적용
-              ad.style.maxWidth = '100%';
-              ad.style.width = '100%';
-              ad.style.boxSizing = 'border-box';
+              const element = ad as HTMLElement;
+              element.style.maxWidth = '100%';
+              element.style.width = '100%';
+              element.style.boxSizing = 'border-box';
             }
           });
         });
@@ -84,15 +102,16 @@ export function CoupangAd() {
             // body에 직접 추가된 요소 중 root가 아닌 것들
             if (node.nodeType === Node.ELEMENT_NODE &&
               node.parentNode === document.body &&
-              node.id !== 'root' &&
+              (node as HTMLElement).id !== 'root' &&
               adRef.current) {
               console.log("🚨 새로운 요소 감지, 컨테이너로 이동:", node);
               adRef.current.appendChild(node);
 
               // 스타일 적용
-              node.style.maxWidth = '100%';
-              node.style.width = '100%';
-              node.style.boxSizing = 'border-box';
+              const element = node as HTMLElement;
+              element.style.maxWidth = '100%';
+              element.style.width = '100%';
+              element.style.boxSizing = 'border-box';
             }
           });
         }
@@ -133,7 +152,7 @@ export function CoupangAd() {
       console.log("✅ 쿠팡 스크립트 로드됨 (첫 번째)");
       console.log("window.PartnersCoupang:", window.PartnersCoupang);
       // 2. 광고 생성 (중복 방지 체크)
-      if (!isAdInitialized) {
+      if (!isAdInitialized && window.PartnersCoupang) {
         new window.PartnersCoupang.G({
           id: 898377,
           template: "carousel",
@@ -152,7 +171,9 @@ export function CoupangAd() {
       console.error("❌ 쿠팡 스크립트 로드 실패");
     };
 
-    adRef.current.appendChild(script);
+    if (adRef.current) {
+      adRef.current.appendChild(script);
+    }
 
     // cleanup function
     return () => {
