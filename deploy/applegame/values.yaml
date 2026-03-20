@@ -1,6 +1,6 @@
 image:
   repository: ghcr.io/digitaltoys/applegame
-  tag: "latest"
+  tag: "0e74d84"
 
 replicaCount: 1
 
