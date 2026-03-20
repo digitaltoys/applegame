@@ -1,0 +1,4 @@
+defaultNamespace: default
+helm:
+  releaseName: applegame
+  chart: .
