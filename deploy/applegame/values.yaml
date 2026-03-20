@@ -31,4 +31,34 @@ resources:
     memory: "512Mi"
     cpu: "500m"
 
-extraEnv: []
+extraEnv:
+  - name: VITE_COUCHDB_URL
+    valueFrom:
+      secretKeyRef:
+        name: applegame-secret
+        key: VITE_COUCHDB_URL
+  - name: VITE_COUCHDB_ADMIN_USER
+    valueFrom:
+      secretKeyRef:
+        name: applegame-secret
+        key: VITE_COUCHDB_ADMIN_USER
+  - name: VITE_COUCHDB_ADMIN_PASS
+    valueFrom:
+      secretKeyRef:
+        name: applegame-secret
+        key: VITE_COUCHDB_ADMIN_PASS
+  - name: VITE_COUCHDB_DATABASE
+    valueFrom:
+      secretKeyRef:
+        name: applegame-secret
+        key: VITE_COUCHDB_DATABASE
+  - name: VITE_COUCHDB_USER
+    valueFrom:
+      secretKeyRef:
+        name: applegame-secret
+        key: VITE_COUCHDB_USER
+  - name: VITE_COUCHDB_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: applegame-secret
+        key: VITE_COUCHDB_PASSWORD
