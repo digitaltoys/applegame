@@ -37,6 +37,11 @@ jobs:
           context: .
           push: true
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.tag }}
+          build-args: |
+            VITE_COUCHDB_URL=${{ secrets.VITE_COUCHDB_URL }}
+            VITE_COUCHDB_DATABASE=${{ secrets.VITE_COUCHDB_DATABASE }}
+            VITE_COUCHDB_USER=${{ secrets.VITE_COUCHDB_USER }}
+            VITE_COUCHDB_PASSWORD=${{ secrets.VITE_COUCHDB_PASSWORD }}
 
       - name: values.yaml 이미지 태그 업데이트
         run: |
