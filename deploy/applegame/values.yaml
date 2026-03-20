@@ -1,6 +1,6 @@
 image:
   repository: ghcr.io/digitaltoys/applegame
-  tag: "e2407c3"
+  tag: "385099f"
 
 replicaCount: 1
 
